@@ -1,11 +1,13 @@
 import { Router } from 'express';
-import { registerUser, loginUser, } from '../controllers/authController';
-import { loginValidationRules, registerValidationRules } from '../utlis/validations/authValidations';
+import { registerUser, loginUser, verifyOTP, resendOTP} from '../controllers/authController';
+import { loginValidationRules, registerValidationRules} from '../utlis/validations/authValidations';
 
 const router = Router();
 
 // Email and Password Registration and Login
 router.post('/register',registerValidationRules, registerUser);
+router.post('/verifyotp',verifyOTP);
+router.post('/resendotp',resendOTP);
 router.post('/login',loginValidationRules, loginUser);
 
 

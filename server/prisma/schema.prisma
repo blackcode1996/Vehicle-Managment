@@ -23,17 +23,24 @@ model User {
   phone    String?
   address  String?
   role     UserRole  @default(CUSTOMER)
-  bookings Booking[]  
+  bookings Booking[]
   shop     Shop?     @relation("ShopAdmin")
   shopId   String?   @db.Uuid
   vehicles Vehicle[] @relation("VehicleAdmin")
+
+  otp            String?
+  otpExpiresAt   DateTime? 
+  otpAttempts    Int       @default(0)
+  blacklisted    Boolean   @default(false)
+  blacklistUntil DateTime? 
+  verified       Boolean   @default(false) 
 }
 
 model Vehicle {
   id                 String    @id @default(uuid()) @db.Uuid
   registrationNumber String    @unique
   bookedStatus       Boolean   @default(false)
-  bookings           Booking[] 
+  bookings           Booking[]
   model              Model     @relation(fields: [modelId], references: [id])
   modelId            String    @db.Uuid
   admin              User      @relation("VehicleAdmin", fields: [adminId], references: [id])
@@ -45,7 +52,7 @@ model Vehicle {
 model Brand {
   id     String  @id @default(uuid()) @db.Uuid
   name   String  @unique
-  models Model[] 
+  models Model[]
 }
 
 model Model {
@@ -62,7 +69,7 @@ model Shop {
   description String
   admin       User      @relation("ShopAdmin", fields: [userId], references: [id]) // Define the relation here
   address     String
-  vehicles    Vehicle[] 
+  vehicles    Vehicle[]
   userId      String    @unique @db.Uuid
 }
 
