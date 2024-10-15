@@ -1,7 +1,16 @@
-const Home = () => {
-  return (
-    <div>Home</div>
-  )
-}
 
-export default Home
+import HeroSection from "../components/HeroSection";
+// import Services from "../components/Services";
+
+const Home = () => {
+    return (
+      <>
+       <HeroSection/>
+       {/* <Services/> */}
+       </>
+    );
+};
+
+export default Home;
+
+

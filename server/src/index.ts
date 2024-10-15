@@ -6,6 +6,7 @@ import morgan from 'morgan';
 import authRoutes from './routes/authRoutes';
 import profileRoutes from './routes/profileRoutes';
 import vehicleRoutes from "./routes/vehicleRoutes";
+import shopRoutes from "./routes/shopRoutes";
 
 
 
@@ -35,7 +36,9 @@ app.set('view engine', 'ejs');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users',profileRoutes);
-app.use('api/vehicles',vehicleRoutes);
+app.use('/api/shop',shopRoutes);
+app.use('/api/vehicles',vehicleRoutes);
+
 
 
 const PORT = process.env.PORT || 3000;

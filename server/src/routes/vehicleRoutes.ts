@@ -4,11 +4,7 @@ import { createVehicle, updateVehicle, deleteVehicle } from '../controllers/vehi
 
 const router = Router();
 
-// Apply authentication middleware
-router.use(authenticate);
-
-// Apply role-based authorization for specific routes
-router.post('/vehicles', authorizeRole(["ADMIN", "SUPER_ADMIN"]), createVehicle);
+router.post('/create',authenticate, authorizeRole(["ADMIN", "SUPER_ADMIN"]), createVehicle);
 router.put('/vehicles/:id', authorizeRole(["ADMIN", "SUPER_ADMIN"]), updateVehicle);
 router.delete('/vehicles/:id', authorizeRole(["ADMIN", "SUPER_ADMIN"]), deleteVehicle);
 

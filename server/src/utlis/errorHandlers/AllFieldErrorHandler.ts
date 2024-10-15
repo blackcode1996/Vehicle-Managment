@@ -14,4 +14,5 @@ export const validateRequiredFields = (requiredFields: string[], data: any) => {
         error.name = 'ValidationError';
         throw error;
     }
+
 };

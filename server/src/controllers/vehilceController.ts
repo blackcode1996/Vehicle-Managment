@@ -5,9 +5,10 @@ import { createVehicleService, updateVehicleService, deleteVehicleService } from
 export const createVehicle = async (req: Request, res: Response) => {
     const { registrationNumber, modelId, shopId } = req.body;
     const adminId = req.user?.userId;
+    const role = req.user?.role;
 
     try {
-        const vehicle = await createVehicleService({ registrationNumber, modelId, shopId, adminId });
+        const vehicle = await createVehicleService({ registrationNumber, modelId, shopId, adminId, role });
         res.status(201).json({ message: 'Vehicle created successfully', vehicle });
     } catch (error: any) {
         res.status(500).json({ message: 'Error creating vehicle', error: error.message });

@@ -1,6 +1,18 @@
 import prisma from '../models/index';
 
-export const createVehicleService = async ({ registrationNumber, modelId, shopId, adminId }: { registrationNumber: string, modelId: string, shopId?: string, adminId: string | undefined }) => {
+export const createVehicleService = async ({
+    registrationNumber,
+    modelId,
+    shopId,
+    adminId,
+    role,
+}: {
+    registrationNumber: string;
+    modelId: string;
+    shopId?: string;
+    adminId: string | undefined;
+    role: string | undefined;
+}) => {
     const existingVehicle = await prisma.vehicle.findUnique({
         where: { registrationNumber },
     });
@@ -9,7 +21,13 @@ export const createVehicleService = async ({ registrationNumber, modelId, shopId
         throw new Error('Vehicle already exists');
     }
 
-    // Create new vehicle
+    if (role === 'ADMIN') {
+        const admin = await prisma.user.findUnique({ where: { id: adminId } });
+        if (admin?.shopId !== shopId) {
+            throw new Error('Unauthorized to create vehicle for this shop');
+        }
+    }
+
     const vehicle = await prisma.vehicle.create({
         data: {
             registrationNumber,
@@ -21,7 +39,6 @@ export const createVehicleService = async ({ registrationNumber, modelId, shopId
 
     return vehicle;
 };
-
 export const updateVehicleService = async (id: string, { registrationNumber, modelId, shopId, bookedStatus }: { registrationNumber?: string, modelId?: string, shopId?: string, bookedStatus?: boolean }) => {
     const vehicle = await prisma.vehicle.update({
         where: { id },
