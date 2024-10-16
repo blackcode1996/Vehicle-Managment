@@ -76,7 +76,7 @@ const Header = () => {
                 </div>
 
                 {/* Tooltip with Signup/Login buttons */}
-                <div className="absolute top-12 right-[-50px] mt-1 w-[180px] bg-black shadow-md rounded-lg p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-300 z-50">
+                <div onClick={() => setLocalStorage("regsiterAsSeller", false)} className="absolute top-12 right-[-50px] mt-1 w-[180px] bg-black shadow-md rounded-lg p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-300 z-50">
                   <Link to="/registartion">
                     <button className="w-full bg-red-500 text-white font-bold py-2 px-4 rounded-full hover:bg-red-700 transition-all duration-300">
                       SignUp/Login

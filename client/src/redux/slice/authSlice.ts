@@ -1,10 +1,23 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import axiosInstance from '../../utils/axiosInstance';
+import { setLocalStorage } from '../../utils/LocalStorage';
+
+interface User {
+  name: string;
+  email: string;
+  password: string;
+  role: string;
+  token?: string; 
+}
 
 interface AuthState {
-  user: null | { name: string; email: string; role: string };
+  user: null | User;
   loading: boolean;
   error: null | string;
+}
+
+interface RootState {
+  auth: AuthState;
 }
 
 const initialState: AuthState = {
@@ -16,20 +29,28 @@ const initialState: AuthState = {
 export const registerUser = createAsyncThunk(
   'auth/registerUser',
   async (userData: { name: string; email: string; password: string; role: string }) => {
-    const response = await axios.post('/api/auth/register', userData);
+    const response = await axiosInstance.post('/api/auth/register', userData);
+    setLocalStorage("user", response.data.data);
     return response.data; 
   }
 );
 
-const authSlice = createSlice({
+export const loginUser = createAsyncThunk(
+  'auth/loginUser',
+  async (userData: { email: string; password: string }) => {
+    const response = await axiosInstance.post('/api/auth/login', userData);
+    setLocalStorage("userToken", response.data.data.token);
+    console.log(response.data)
+    return response.data; 
+  }
+);
+
+export const authSlice = createSlice({
   name: 'auth',
   initialState,
-  reducers: {
-    resetError(state) {
-      state.error = null; 
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
+    // Registration cases
     builder
       .addCase(registerUser.pending, (state) => {
         state.loading = true;
@@ -42,9 +63,26 @@ const authSlice = createSlice({
       .addCase(registerUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Registration failed'; 
+      })
+      // Login cases
+      .addCase(loginUser.pending, (state) => {
+        state.loading = true;
+        state.error = null; 
+      })
+      .addCase(loginUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = { ...action.payload.user, token: action.payload.token }; 
+      })
+      .addCase(loginUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Login failed'; 
       });
   },
 });
 
-export const { resetError } = authSlice.actions;
+export const userData = (state: RootState) => state.auth.user;
+export const userToken = (state: RootState) => state.auth.user?.token; 
+export const userError = (state: RootState) => state.auth.error;
+export const userLoading = (state: RootState) => state.auth.loading;
+
 export default authSlice.reducer;

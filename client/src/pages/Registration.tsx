@@ -3,10 +3,7 @@ import RegistrationForm from "../components/RegistrationForm";
 import { getLocalStorage } from "../utils/LocalStorage";
 
 const Registration = () => {
-
-    const resgisterAsSeller =  getLocalStorage("regsiterAsSeller");
-
-    console.log(resgisterAsSeller);
+  const resgisterAsSeller = getLocalStorage("regsiterAsSeller");
 
   return (
     <div className="relative min-h-screen flex">
@@ -24,11 +21,11 @@ const Registration = () => {
           </video>
           <div className="absolute bg-gradient-to-b from-primary to-secondary opacity-20 inset-0 z-0"></div>
           <div className="absolute triangle min-h-screen right-0 w-20"></div>
-          <ul className="circles">
+          {/* <ul className="circles">
             {[...Array(10)].map((_, index) => (
               <li key={index}></li>
             ))}
-          </ul>
+          </ul> */}
         </div>
 
         {/* Right Side Form */}
@@ -36,13 +33,15 @@ const Registration = () => {
           <div className="max-w-md w-full space-y-8">
             <div className="text-center">
               <h2 className="mt-6 text-3xl font-bold text-primary">
-                Start your journey
+                {resgisterAsSeller
+                  ? "Unpack your jounrney with caring"
+                  : "Start your journey"}
               </h2>
               <p className="mt-2 text-sm text-secondary">
                 Please sign in to your account
               </p>
             </div>
-            <RegistrationForm resgisterAsSeller={resgisterAsSeller}/>
+            <RegistrationForm resgisterAsSeller={resgisterAsSeller} />
           </div>
         </div>
       </div>

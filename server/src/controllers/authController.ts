@@ -28,8 +28,7 @@ export const registerUser = async (req: Request, res: Response) => {
 
         res.status(201).json({ message: 'User registered successfully. Please check your mail to verify your email.', user });
     } catch (error: any) {
-        console.error(error);
-        res.status(400).json({ error: error.message || 'Something went wrong' });
+        res.status(400).json({error: error.message});
     }
 };
 

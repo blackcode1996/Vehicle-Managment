@@ -9,6 +9,13 @@
   font-family: monospace;
 }
 
+.Toastify__toast--error {
+  background-color: #ff4d4f; 
+}
+.Toastify__toast--success {
+  background-color: #52c41a; 
+}
+
 
 .circles {
   position: absolute;
