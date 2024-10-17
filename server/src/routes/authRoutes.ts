@@ -4,7 +4,6 @@ import { loginValidationRules, registerValidationRules} from '../utlis/validatio
 
 const router = Router();
 
-// Email and Password Registration and Login
 router.post('/register',registerValidationRules, registerUser);
 router.post('/verifyotp',verifyOTP);
 router.post('/resendotp',resendOTP);

@@ -13,7 +13,6 @@ const updateProfile = async (id: string, data: { name?: string; phone?: string; 
     });
 };
 
-
 const getAllProfiles = async () => {
     return prisma.user.findMany({
         select: {
@@ -47,8 +46,6 @@ const resetPassword = async (id: string, hashedPassword: string) => {
         data: { password: hashedPassword },
     });
 };
-
-
 
 export default {
     getProfile,

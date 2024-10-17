@@ -1,11 +1,15 @@
-import { Router } from 'express';
+import express from 'express';
+import { createVehicle, getAllVehicles, getVehicleById, updateVehicle, deleteVehicle } from '../controllers/vehilceController';
 import { authenticate, authorizeRole } from '../middlewares/validateAuthenticated';
-import { createVehicle, updateVehicle, deleteVehicle } from '../controllers/vehilceController';
+import { upload } from '../utlis/multerConfig';
 
-const router = Router();
+const router = express.Router();
 
-router.post('/create',authenticate, authorizeRole(["ADMIN", "SUPER_ADMIN"]), createVehicle);
-router.put('/vehicles/:id', authorizeRole(["ADMIN", "SUPER_ADMIN"]), updateVehicle);
-router.delete('/vehicles/:id', authorizeRole(["ADMIN", "SUPER_ADMIN"]), deleteVehicle);
+
+router.post('/', authenticate, authorizeRole(['ADMIN', 'SUPER_ADMIN']), upload.array('vehicleImg'), createVehicle);
+router.get('/', getAllVehicles);
+router.get('/:id', getVehicleById);
+router.put('/:id', authenticate, authorizeRole(['ADMIN', 'SUPER_ADMIN']), upload.array('vehicleImg'), updateVehicle);
+router.delete('/:id', authenticate, authorizeRole(['ADMIN', 'SUPER_ADMIN']), deleteVehicle);
 
 export default router;

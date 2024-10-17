@@ -1,5 +1,3 @@
-// schema.prisma
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -15,25 +13,31 @@ enum UserRole {
   SUPER_ADMIN
 }
 
-model User {
-  id       String    @id @default(uuid()) @db.Uuid
-  name     String
-  email    String    @unique
-  password String
-  phone    String?
-  address  String?
-  role     UserRole  @default(CUSTOMER)
-  bookings Booking[]
-  shop     Shop?     @relation("ShopAdmin")
-  shopId   String?   @db.Uuid
-  vehicles Vehicle[] @relation("VehicleAdmin")
+enum FuelType {
+  PETROL
+  DIESEL
+  ELECTRIC
+  HYBRID
+}
 
+model User {
+  id             String    @id @default(uuid()) @db.Uuid
+  name           String
+  email          String    @unique
+  password       String
+  phone          String?
+  address        String?
+  role           UserRole  @default(CUSTOMER)
+  bookings       Booking[]
+  shop           Shop?     @relation("ShopAdmin")
+  shopId         String?   @db.Uuid
+  vehicles       Vehicle[] @relation("VehicleAdmin")
   otp            String?
-  otpExpiresAt   DateTime? 
+  otpExpiresAt   DateTime?
   otpAttempts    Int       @default(0)
   blacklisted    Boolean   @default(false)
-  blacklistUntil DateTime? 
-  verified       Boolean   @default(false) 
+  blacklistUntil DateTime?
+  verified       Boolean   @default(false)
 }
 
 model Vehicle {
@@ -47,27 +51,35 @@ model Vehicle {
   adminId            String    @db.Uuid
   Shop               Shop?     @relation(fields: [shopId], references: [id])
   shopId             String?   @db.Uuid
+  perHourCharge      Float
+  fuelType           FuelType
+  vehicleImg         String[] 
 }
 
 model Brand {
-  id     String  @id @default(uuid()) @db.Uuid
-  name   String  @unique
-  models Model[]
+  id          String  @id @default(uuid()) @db.Uuid
+  name        String  @unique
+  logo        String?
+  description String?
+  models      Model[]
 }
 
 model Model {
-  id       String    @id @default(uuid()) @db.Uuid
-  name     String
-  brand    Brand     @relation(fields: [brandId], references: [id])
-  brandId  String    @db.Uuid
-  vehicles Vehicle[]
+  id          String     @id @default(uuid()) @db.Uuid
+  name        String
+  brand       Brand      @relation(fields: [brandId], references: [id])
+  brandId     String     @db.Uuid
+  vehicles    Vehicle[]
+  fuelTypes   FuelType[]
+  description String?
+  modelImg    String?
 }
 
 model Shop {
   id          String    @id @default(uuid()) @db.Uuid
   name        String
   description String
-  admin       User      @relation("ShopAdmin", fields: [userId], references: [id]) // Define the relation here
+  admin       User      @relation("ShopAdmin", fields: [userId], references: [id])
   address     String
   vehicles    Vehicle[]
   userId      String    @unique @db.Uuid

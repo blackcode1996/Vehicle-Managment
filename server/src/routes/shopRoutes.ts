@@ -9,9 +9,7 @@ import {
 
 const router = express.Router();
 
-router.use(authenticate);
 
-// Routes
 router.post('/', authenticate, authorizeRole(["ADMIN", "SUPER_ADMIN"]), createShop);
 router.get('/', authenticate, authorizeRole(["ADMIN", "SUPER_ADMIN"]), getShops);
 router.put('/:id', authenticate,authorizeRole(["ADMIN", "SUPER_ADMIN"]),updateShop);

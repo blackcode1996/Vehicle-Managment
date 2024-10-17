@@ -1,39 +1,95 @@
-// vehicleController.ts
 import { Request, Response } from 'express';
-import { createVehicleService, updateVehicleService, deleteVehicleService } from '../services/vehicleService';
+import * as vehicleService from '../services/vehicleService';
+import { uploadMultipleImages } from '../services/cloudinaryService';
+
 
 export const createVehicle = async (req: Request, res: Response) => {
-    const { registrationNumber, modelId, shopId } = req.body;
-    const adminId = req.user?.userId;
-    const role = req.user?.role;
+    const { registrationNumber, modelId, shopId, perHourCharge, fuelType } = req.body;
+    const adminId = req?.user?.userId;
+
+    const files: any = req.files;
 
     try {
-        const vehicle = await createVehicleService({ registrationNumber, modelId, shopId, adminId, role });
-        res.status(201).json({ message: 'Vehicle created successfully', vehicle });
+        const vehicleImg = files ? await uploadMultipleImages(files.map((file: any) => file.buffer)) : undefined;
+
+        const vehicle = await vehicleService.createVehicleService({
+            registrationNumber,
+            modelId,
+            shopId,
+            adminId,
+            perHourCharge: parseFloat(perHourCharge),
+            fuelType,
+            vehicleImg: vehicleImg?.map((img) => img.secure_url),
+        });
+
+        return res.status(201).json({ message: "Vehicle created successfully.", vehicle });
     } catch (error: any) {
-        res.status(500).json({ message: 'Error creating vehicle', error: error.message });
+        return res.status(400).json({ error: error.message });
+    }
+};
+
+export const getAllVehicles = async (req: Request, res: Response) => {
+    try {
+        const vehicles = await vehicleService.getAllVehiclesService();
+        return res.status(200).json(vehicles);
+    } catch (error: any) {
+        return res.status(500).json({ error: error.message });
+    }
+};
+
+export const getVehicleById = async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    try {
+        const vehicle = await vehicleService.getVehicleByIdService(id);
+        if (!vehicle) return res.status(404).json({ error: 'Vehicle not found' });
+        return res.status(200).json(vehicle);
+    } catch (error: any) {
+        return res.status(500).json({ error: error.message });
     }
 };
 
 export const updateVehicle = async (req: Request, res: Response) => {
     const { id } = req.params;
-    const { registrationNumber, modelId, shopId, bookedStatus } = req.body;
+    const {
+        registrationNumber,
+        modelId,
+        shopId,
+        bookedStatus,
+        perHourCharge,
+        fuelType,
+    } = req.body;
+
+    const files: any = req.files;
 
     try {
-        const vehicle = await updateVehicleService(id, { registrationNumber, modelId, shopId, bookedStatus });
-        res.status(200).json({ message: 'Vehicle updated successfully', vehicle });
+        const vehicleImg = files ? await uploadMultipleImages(files.map((file: any) => file.buffer)) : undefined;
+
+
+        const vehicle = await vehicleService.updateVehicleService(id, {
+            registrationNumber,
+            modelId,
+            shopId,
+            bookedStatus,
+            perHourCharge,
+            fuelType,
+            vehicleImg: vehicleImg?.map((img) => img.secure_url),
+        });
+
+        return res.status(200).json({ message: "Vehicle updated successfully.", vehicle });
     } catch (error: any) {
-        res.status(500).json({ message: 'Error updating vehicle', error: error.message });
+        return res.status(400).json({ error: error.message });
     }
 };
+
 
 export const deleteVehicle = async (req: Request, res: Response) => {
     const { id } = req.params;
 
     try {
-        const vehicle = await deleteVehicleService(id);
-        res.status(200).json({ message: 'Vehicle deleted successfully', vehicle });
+        const vehicle = await vehicleService.deleteVehicleService(id);
+        return res.status(200).json(vehicle);
     } catch (error: any) {
-        res.status(500).json({ message: 'Error deleting vehicle', error: error.message });
+        return res.status(500).json({ error: error.message });
     }
 };
