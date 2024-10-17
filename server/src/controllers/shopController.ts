@@ -37,25 +37,21 @@ export const createShop = async (req: Request, res: Response) => {
 };
 
 export const getShops = async (req: Request, res: Response) => {
-    const userId = req.user?.userId;
-    const userRole = req.user?.role;
-
-    if (!userId) {
-        return res.status(401).json({ message: 'Unauthorized: User ID is required.' });
-    }
+    const { page = 1, limit = 10, search = '', sortField = 'name', sortOrder = 'asc' } = req.query;
 
     try {
-        if (userRole === 'SUPER_ADMIN') {
-            const shops = await getShopsService();
-            return res.status(200).json(shops);
-        }
-
-        const shops = await getShopByIdService(userId);
-        res.status(200).json(shops);
+        const shops = await getShopsService({
+            page: Number(page),
+            limit: Number(limit),
+            search: String(search),
+            sortField: String(sortField),
+            sortOrder: sortOrder === 'asc' || sortOrder === 'desc' ? sortOrder : 'asc',
+        });
+        return res.status(200).json(shops);
     } catch (error: any) {
         res.status(500).json({ message: 'Error fetching shops', error: error.message });
     }
-};
+}
 
 export const updateShop = async (req: Request, res: Response) => {
     const { id } = req.params;

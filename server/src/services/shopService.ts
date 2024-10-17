@@ -1,18 +1,56 @@
-import prisma  from '../models/index';
+import { Prisma } from '@prisma/client';
+import prisma from '../models/index';
 
-export const createShopService = async ({ name, description, address, userId }: { name: string, description: string, address: string, userId: string}) => {
+export const createShopService = async ({ name, description, address, userId }: { name: string, description: string, address: string, userId: string }) => {
     return await prisma.shop.create({
         data: {
             name,
             description,
             address,
-            userId 
+            userId
         }
     });
 };
 
-export const getShopsService = async () => {
-    return await prisma.shop.findMany();
+export const getShopsService = async ({
+    page,
+    limit,
+    search,
+    sortField = 'name',
+    sortOrder = 'asc',
+}: {
+    page: number;
+    limit: number;
+    search: string;
+    sortField: string;
+    sortOrder: 'asc' | 'desc';
+}) => {
+    const skip = (page - 1) * limit;
+
+    const where = search
+        ? {
+            name: {
+                contains: search,
+                mode: Prisma.QueryMode.insensitive,
+            },
+        }
+        : {};
+
+    const shops = await prisma.shop.findMany({
+        where,
+        orderBy: { [sortField]: sortOrder },
+        skip,
+        take: limit,
+    });
+
+    const totalShops = await prisma.shop.count({ where });
+
+    return {
+        data: shops,
+        totalShops,
+        totalPages: Math.ceil(totalShops / limit),
+        currentPage: page,
+    };
 };
 
 export const getShopByIdService = async (id: string) => {

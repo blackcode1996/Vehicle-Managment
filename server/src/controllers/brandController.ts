@@ -17,8 +17,17 @@ export const createBrand = async (req: Request, res: Response) => {
 };
 
 export const getAllBrands = async (req: Request, res: Response) => {
+    const { page = 1, limit = 10, search = '', sortField = 'name', sortOrder = 'asc' } = req.query;
+
     try {
-        const brands = await brandService.getAllBrandsService();
+        const brands = await brandService.getAllBrandsService({
+            page: Number(page),
+            limit: Number(limit),
+            search: String(search),
+            sortField: String(sortField),
+            sortOrder: sortOrder === 'asc' || sortOrder === 'desc' ? sortOrder : 'asc', 
+        });
+
         return res.status(200).json(brands);
     } catch (error: any) {
         return res.status(500).json({ error: error.message });
@@ -45,7 +54,7 @@ export const updateBrand = async (req: Request, res: Response) => {
     try {
         const logoUrl = file ? await uploadSingleImage(file.buffer) : null;
         const brand = await brandService.updateBrandService(id, name, description, logoUrl);
-        return res.status(200).json({message: 'Brand Updated successfully.',brand});
+        return res.status(200).json({ message: 'Brand Updated successfully.', brand });
     } catch (error: any) {
         return res.status(400).json({ error: error.message });
     }
@@ -56,7 +65,7 @@ export const deleteBrand = async (req: Request, res: Response) => {
 
     try {
         const brand = await brandService.deleteBrandService(id);
-        return res.status(200).json({message: 'Brand deleted successfully.',brand});
+        return res.status(200).json({ message: 'Brand deleted successfully.', brand });
     } catch (error: any) {
         return res.status(500).json({ error: error.message });
     }

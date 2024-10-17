@@ -1,4 +1,4 @@
-import { FuelType } from '@prisma/client';
+import { FuelType, Prisma } from '@prisma/client';
 import prisma from '../models/index';
 
 export const createModelService = async (
@@ -29,12 +29,50 @@ export const createModelService = async (
     return model;
 };
 
-export const getAllModelsService = async () => {
-    return await prisma.model.findMany({
+export const getAllModelsService = async ({
+    page,
+    limit,
+    search,
+    sortField = 'name',
+    sortOrder = 'asc',
+}: {
+    page: number;
+    limit: number;
+    search: string;
+    sortField: string;
+    sortOrder: 'asc' | 'desc';
+}) => {
+    const skip = (page - 1) * limit;
+
+    // Search logic
+    const where = search
+        ? {
+              name: {
+                  contains: search,
+                  mode: Prisma.QueryMode.insensitive, 
+              },
+          }
+        : {};
+
+    const models = await prisma.model.findMany({
+        where,
         include: {
-            brand: true,
+            brand: true, 
         },
+        orderBy: { [sortField]: sortOrder }, 
+        skip,
+        take: limit,
     });
+
+    // Get total number of models (for pagination metadata)
+    const totalModels = await prisma.model.count({ where });
+
+    return {
+        data: models,
+        totalModels,
+        totalPages: Math.ceil(totalModels / limit),
+        currentPage: page,
+    };
 };
 
 export const getModelByIdService = async (id: string) => {

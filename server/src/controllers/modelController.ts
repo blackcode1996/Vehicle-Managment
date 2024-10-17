@@ -27,8 +27,16 @@ export const createModel = async (req: Request, res: Response) => {
 };
 
 export const getAllModels = async (req: Request, res: Response) => {
+    const { page = 1, limit = 10, search = '', sortField = 'name', sortOrder = 'asc' } = req.query;
+
     try {
-        const models = await modelService.getAllModelsService();
+        const models = await modelService.getAllModelsService({
+            page: Number(page),
+            limit: Number(limit),
+            search: String(search),
+            sortField: String(sortField),
+            sortOrder: sortOrder === 'asc' || sortOrder === 'desc' ? sortOrder : 'asc',
+        });
         return res.status(200).json(models);
     } catch (error: any) {
         return res.status(500).json({ error: error.message });

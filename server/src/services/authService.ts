@@ -47,6 +47,7 @@ const register = async ({ name, email, password, role = 'CUSTOMER', otp }: Regis
 
         return { id: user.id, name: user.name, email: user.email, role: user.role };
     } catch (error) {
+        console.log(error);
         throw new Error(`${error}`);
     }
 };

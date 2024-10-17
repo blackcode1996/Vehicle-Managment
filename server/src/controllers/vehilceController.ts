@@ -30,12 +30,26 @@ export const createVehicle = async (req: Request, res: Response) => {
 
 export const getAllVehicles = async (req: Request, res: Response) => {
     try {
-        const vehicles = await vehicleService.getAllVehiclesService();
+        const { page = 1, limit = 10, search = '', sortField = 'registrationNumber', sortOrder = 'asc' } = req.query;
+
+        const parsedPage = parseInt(page as string, 10);
+        const parsedLimit = parseInt(limit as string, 10);
+
+        const vehicles = await vehicleService.getAllVehiclesService({
+            page: parsedPage,
+            limit: parsedLimit,
+            search: search as string,
+            sortField: sortField as string,
+            sortOrder: sortOrder as 'asc' | 'desc',
+        });
+
+        // Return the result
         return res.status(200).json(vehicles);
     } catch (error: any) {
         return res.status(500).json({ error: error.message });
     }
 };
+
 
 export const getVehicleById = async (req: Request, res: Response) => {
     const { id } = req.params;
@@ -55,7 +69,6 @@ export const updateVehicle = async (req: Request, res: Response) => {
         registrationNumber,
         modelId,
         shopId,
-        bookedStatus,
         perHourCharge,
         fuelType,
     } = req.body;
@@ -70,8 +83,7 @@ export const updateVehicle = async (req: Request, res: Response) => {
             registrationNumber,
             modelId,
             shopId,
-            bookedStatus,
-            perHourCharge,
+            perHourCharge: parseFloat(perHourCharge),
             fuelType,
             vehicleImg: vehicleImg?.map((img) => img.secure_url),
         });
@@ -81,7 +93,6 @@ export const updateVehicle = async (req: Request, res: Response) => {
         return res.status(400).json({ error: error.message });
     }
 };
-
 
 export const deleteVehicle = async (req: Request, res: Response) => {
     const { id } = req.params;
