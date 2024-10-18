@@ -13,6 +13,8 @@ const Login = () => {
   const isError = useSelector(userError);
   const usersData = useSelector(userData);
 
+  console.log(usersData);
+
   const formik = useFormik({
     initialValues: {
       email: '',
@@ -25,17 +27,8 @@ const Login = () => {
         password: values.password,
       };
 
-      const action = dispatch(loginUser(userData));
-
-      if (loginUser.fulfilled.match(action)) {
-        const role = usersData?.role;
-        console.log(role);
-        if (role === 'CUSTOMER') {
-          navigate('/vehicles');
-        } else if (role === 'ADMIN') {
-          navigate('/seller');
-        }
-      }
+      dispatch(loginUser(userData));
+      navigate("/seller");
     },
   });
 

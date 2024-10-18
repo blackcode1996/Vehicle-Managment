@@ -11,6 +11,7 @@ import brandRoutes from "./routes/brandRoutes";
 import modelRoutes from "./routes/modelRoutes";
 import vehicleRoutes from "./routes/vehicleRoutes";
 import shopRoutes from "./routes/shopRoutes";
+import bookingRoutes from "./routes/bookingRoutes";
 
 
 
@@ -46,6 +47,7 @@ app.use("/api/brand",brandRoutes);
 app.use("/api/model",modelRoutes);
 app.use('/api/shop',shopRoutes);
 app.use('/api/vehicles',vehicleRoutes);
+app.use('/api/booking',bookingRoutes);
 
 
 

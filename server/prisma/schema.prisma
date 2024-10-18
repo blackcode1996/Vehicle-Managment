@@ -20,6 +20,13 @@ enum FuelType {
   HYBRID
 }
 
+enum BookingStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  CANCELLED
+}
+
 model User {
   id             String    @id @default(uuid()) @db.Uuid
   name           String
@@ -53,7 +60,7 @@ model Vehicle {
   shopId             String?   @db.Uuid
   perHourCharge      Float
   fuelType           FuelType
-  vehicleImg         String[] 
+  vehicleImg         String[]
 }
 
 model Brand {
@@ -82,16 +89,27 @@ model Shop {
   admin       User      @relation("ShopAdmin", fields: [userId], references: [id])
   address     String
   vehicles    Vehicle[]
+  bookings    Booking[] 
   userId      String    @unique @db.Uuid
 }
 
 model Booking {
-  id         String   @id @default(uuid()) @db.Uuid
-  bookedFrom DateTime
-  bookedTo   DateTime
-  status     String
-  vehicle    Vehicle  @relation(fields: [vehicleId], references: [id])
-  vehicleId  String   @db.Uuid
-  user       User     @relation(fields: [userId], references: [id])
-  userId     String   @db.Uuid
+  id                  String        @id @default(uuid()) @db.Uuid
+  bookedFrom          DateTime
+  bookedTo            DateTime
+  bookingFromAddress  String
+  bookingToAddress    String
+  bookingFromLocation Int[]
+  bookingToLocation   Int[]
+  numberOfHours       Int
+  totalAmount         Float
+  status              BookingStatus @default(PENDING)
+  vehicle             Vehicle       @relation(fields: [vehicleId], references: [id])
+  vehicleId           String        @db.Uuid
+  user                User          @relation(fields: [userId], references: [id])
+  userId              String        @db.Uuid
+  cancellationCharges Float?
+  cancellationDate    DateTime?
+  shop                Shop?         @relation(fields: [shopId], references: [id])  // Relation to Shop
+  shopId              String?       @db.Uuid
 }
