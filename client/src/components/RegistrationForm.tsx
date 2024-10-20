@@ -1,19 +1,22 @@
 import { useFormik } from "formik";
 import { Link, useNavigate } from "react-router-dom";
 import { RegistrationValidationSchema } from "../utils/Validation";
-import { registerUser, userData, userError, userLoading } from "../redux/slice/authSlice";
+import {
+  registerUser,
+  userData,
+  userError,
+  userLoading,
+} from "../redux/slice/authSlice";
 import { useAppDispatch } from "../hooks/useAppDispatch";
-import { setLocalStorage } from "../utils/LocalStorage";
+import { removeLocalStorage, setLocalStorage } from "../utils/LocalStorage";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
-
 
 const RegistrationForm = ({
   resgisterAsSeller,
 }: {
   resgisterAsSeller: boolean;
 }) => {
-
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
@@ -36,18 +39,17 @@ const RegistrationForm = ({
         password: values.password,
         role: resgisterAsSeller ? "ADMIN" : "CUSTOMER",
       };
-
-      dispatch(registerUser(userData));      
+      dispatch(registerUser(userData));
     },
   });
 
   useEffect(() => {
     if (!isLoading && !isError && usersData) {
       setLocalStorage("user", usersData);
+      removeLocalStorage("regsiterAsSeller");
       navigate("/verifyEmail");
     }
   }, [isLoading, isError, usersData, navigate]);
-
 
   return (
     <form className="mt-8 space-y-6" onSubmit={formik.handleSubmit}>

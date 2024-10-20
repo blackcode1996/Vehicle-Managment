@@ -14,8 +14,8 @@ export default {
     extend: {
       keyframes: {
         cycle: {
-          "0%": { left: "5%" },
-          "100%": { left: "95%" },
+          "0%": { left: "10%" },
+          "100%": { left: "90%" },
         },
       },
       animation: {

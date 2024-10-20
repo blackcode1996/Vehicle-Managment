@@ -1,9 +1,14 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { useFormik } from 'formik';
-import { loginUser, userData, userError, userLoading } from '../redux/slice/authSlice';
-import { LoginValidationRules } from '../utils/Validation';
-import { useEffect } from 'react';
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { useFormik } from "formik";
+import {
+  loginUser,
+  userData,
+  userError,
+  userLoading,
+} from "../redux/slice/authSlice";
+import { LoginValidationRules } from "../utils/Validation";
+import { useEffect } from "react";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -17,8 +22,8 @@ const Login = () => {
 
   const formik = useFormik({
     initialValues: {
-      email: '',
-      password: '',
+      email: "",
+      password: "",
     },
     validationSchema: LoginValidationRules,
     onSubmit: async (values) => {
@@ -28,25 +33,32 @@ const Login = () => {
       };
 
       dispatch(loginUser(userData));
-      navigate("/seller");
     },
   });
 
   useEffect(() => {
-    if (usersData) {
+    console.log("isLoading:", isLoading);
+    console.log("isError:", isError);
+    console.log("usersData:", usersData);
+
+    if (!isLoading && !isError && usersData) {
       const role = usersData?.role;
-      if (role === 'CUSTOMER') {
-        navigate('/vehicles');
-      } else if (role === 'ADMIN') {
-        navigate('/seller');
+      if (role === "CUSTOMER") {
+        navigate("/vehilcles");
+      } else if (role === "ADMIN") {
+        navigate("/seller");
       }
     }
-  }, [usersData, navigate]); 
+  }, [isLoading, isError, usersData, navigate]);
 
   return (
     <div className="h-screen flex overflow-hidden bg-neutral">
       <div className="w-full relative flex">
-        <svg viewBox="0 0 400 150" preserveAspectRatio="none" className="h-full w-full">
+        <svg
+          viewBox="0 0 400 150"
+          preserveAspectRatio="none"
+          className="h-full w-full"
+        >
           <defs>
             <linearGradient id="myGradient" gradientTransform="rotate(90)">
               <stop offset="5%" stopColor="#dc2626" />
@@ -68,13 +80,16 @@ const Login = () => {
           </Link>
         </div>
 
-        <form className="absolute inset-0 flex flex-col items-center justify-center px-8" onSubmit={formik.handleSubmit}>
+        <form
+          className="absolute inset-0 flex flex-col items-center justify-center px-8"
+          onSubmit={formik.handleSubmit}
+        >
           <h1 className="text-5xl text-primary font-bold mb-8">Welcome Back</h1>
           <input
             className="py-2 px-4 border rounded mt-4 text-primary placeholder-primary w-full max-w-md focus:outline-none focus:ring focus:ring-secondary"
             type="email"
             placeholder="Type your email"
-            {...formik.getFieldProps('email')}
+            {...formik.getFieldProps("email")}
           />
           {formik.touched.email && formik.errors.email ? (
             <div className="text-red-500">{formik.errors.email}</div>
@@ -83,7 +98,7 @@ const Login = () => {
             className="py-2 px-4 border rounded mt-4 placeholder-primary text-primary w-full max-w-md focus:outline-none focus:ring focus:ring-secondary"
             type="password"
             placeholder="Type your password"
-            {...formik.getFieldProps('password')}
+            {...formik.getFieldProps("password")}
           />
           {formik.touched.password && formik.errors.password ? (
             <div className="text-red-500">{formik.errors.password}</div>

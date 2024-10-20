@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
 import profileService from '../services/profileService';
 import { validationResult } from 'express-validator';
+import { uploadSingleImage } from '../services/cloudinaryService';
 
 
 export const getProfile = async (req: Request, res: Response) => {
@@ -23,7 +24,7 @@ export const getProfile = async (req: Request, res: Response) => {
 
 export const updateProfile = async (req: Request, res: Response) => {
     try {
-        const userId = req.user?.userId; 
+        const userId = req.user?.userId;
         if (!userId) {
             return res.status(401).json({ message: 'Unauthorized' });
         }
@@ -33,15 +34,17 @@ export const updateProfile = async (req: Request, res: Response) => {
             return res.status(400).json({ errors: errors.array() });
         }
 
-        const { name, phone, address } = req.body; 
+        const { name, phone, address } = req.body;
+        const file = req.file;
+        const avatar = file ? await uploadSingleImage(file.buffer) : null;
 
-        const updatedData = { name, phone, address };
+        const updatedData = { name, phone, address, avatar };
 
         const updatedProfile = await profileService.updateProfile(userId, updatedData);
 
         res.status(200).json({ message: 'Profile updated successfully', updatedProfile });
     } catch (error: any) {
-        console.error(error); 
+        console.error(error);
         res.status(500).json({ error: error.message || 'An error occurred while updating the profile' });
     }
 };
@@ -90,7 +93,7 @@ export const resetPassword = async (req: Request, res: Response) => {
             return res.status(400).json({ errors: errors.array() });
         }
 
-        const userId = req.user?.userId; 
+        const userId = req.user?.userId;
         if (!userId) {
             return res.status(401).json({ message: 'Unauthorized' });
         }

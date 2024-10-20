@@ -5,7 +5,7 @@ import Header from "../components/Header"
 
 const Wrapper = () => {
   return (
-    <div className="h-[100%]">
+    <div>
         <Header/>
         <Outlet/>
         <Footer/>

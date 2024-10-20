@@ -7,6 +7,7 @@ import VerifyEmail from "../pages/VerifyEmail";
 import Seller from "../pages/Seller";
 import Vehicles from "../pages/Vehicles";
 import PrivateRoutes from "../hoc/privateRoutes";
+import Profile from "../pages/Profile";
 
 const router = createBrowserRouter([
   {
@@ -39,9 +40,13 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "/vehilces",
+        path: "/vehilcles",
         element: <Vehicles />,
       },
+      {
+        path:"/profile",
+        element: <Profile/>
+      }
     ],
   },
 ]);

@@ -6,7 +6,7 @@ const getProfile = async (id: string | undefined) => {
     });
 };
 
-const updateProfile = async (id: string, data: { name?: string; phone?: string; address?: string }) => {
+const updateProfile = async (id: string, data: { name?: string; phone?: string; address?: string; avatar?: string | null }) => {
     return await prisma.user.update({
         where: { id },
         data,
