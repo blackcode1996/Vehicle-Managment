@@ -75,6 +75,8 @@ export const updateVehicle = async (req: Request, res: Response) => {
 
     const files: any = req.files;
 
+    console.log(files);
+
     try {
         const vehicleImg = files ? await uploadMultipleImages(files.map((file: any) => file.buffer)) : undefined;
 

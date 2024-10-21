@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { getLocalStorage } from '../../utils/LocalStorage';
+import { userData } from './authSlice';
 
 interface VehicleData {
   id: string;
@@ -40,7 +41,7 @@ const initialState: VehicleState = {
 };
 
 interface RootState {
-    vehicle: VehicleState;  // Correct the typo here
+    vehicle: VehicleState; 
 }
 
 export const getVehicles = createAsyncThunk('/api/vehicles', async (_, { rejectWithValue }) => {
@@ -58,11 +59,33 @@ export const getVehicles = createAsyncThunk('/api/vehicles', async (_, { rejectW
   }
 });
 
+export const updateCar = createAsyncThunk(
+  'vehicle/updateCar',
+  async ({ id, updatedCarData }: { id: string; updatedCarData: Partial<VehicleData> }, { rejectWithValue }) => {
+    try {
+      const token = getLocalStorage('userToken') || '';
+      console.log({updatedCarData});
+      const response = await axios.put(`/api/vehicles/${id}`, updatedCarData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+
+
 const vehicleSlice = createSlice({
   name: 'vehicle',
   initialState,
   reducers: {},
   extraReducers: (builder) => {
+    // Add car logic
     builder
       .addCase(getVehicles.pending, (state) => {
         state.loading = true;
@@ -78,9 +101,31 @@ const vehicleSlice = createSlice({
         state.loading = false;
         state.error = action.payload.message || 'Failed to fetch vehicles';
         state.success = false;
+      })
+      // Update car logic
+      .addCase(updateCar.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.success = false;
+      })
+      .addCase(updateCar.fulfilled, (state, action: PayloadAction<{ data: VehicleData }>) => {
+        if (state.vehicleData) {
+          const index = state.vehicleData.findIndex(car => car.id === action.payload.data.id);
+          if (index !== -1) {
+            state.vehicleData[index] = action.payload.data;
+          }
+        }
+        state.loading = false;
+        state.success = true;
+      })
+      .addCase(updateCar.rejected, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error = action.payload.message || 'Failed to update vehicle';
+        state.success = false;
       });
   },
 });
+
 
 export const vehicleData=(state: RootState)=>state.vehicle.vehicleData;
 export const vehicleLoading = (state: RootState)=> state.vehicle.loading;

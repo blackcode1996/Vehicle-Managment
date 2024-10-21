@@ -71,6 +71,9 @@ const Profile = () => {
     setHasChanges(isDifferent);
   };
 
+
+  console.log(selectedFile);
+
   const handleSubmit = (values: any) => {
     const changedValues: any = {};
   
