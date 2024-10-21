@@ -49,7 +49,7 @@ const OTPForm: React.FC<OTPFormProps> = ({ email }) => {
 
   const handlePaste = (e: ClipboardEvent) => {
     e.preventDefault();
-    const text = e.clipboardData.getData("text");
+    const text = e.clipboardData.getData("text") as string;
 
     if (!/^\d{6}$/.test(text)) {
       return;

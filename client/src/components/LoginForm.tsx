@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useFormik } from "formik";
 import {
   loginUser,
@@ -9,10 +9,11 @@ import {
 } from "../redux/slice/authSlice";
 import { LoginValidationRules } from "../utils/Validation";
 import { useEffect } from "react";
+import { useAppDispatch } from "../hooks/useAppDispatch";
 
 const Login = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const isLoading = useSelector(userLoading);
   const isError = useSelector(userError);

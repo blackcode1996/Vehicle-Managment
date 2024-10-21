@@ -35,7 +35,7 @@ export const getProfile = createAsyncThunk('profile/getProfile', async (_, { rej
     }
 });
 
-export const updateProfile = createAsyncThunk('profile/updateProfile', async (updatedData: Partial<UserProfile>, { rejectWithValue }) => {
+export const updateProfile = createAsyncThunk('profile/updateProfile', async (updatedData: UserProfile, { rejectWithValue }) => {
     try {
         const token = getLocalStorage("userToken") || "";
         const response = await axios.put('/api/users/profile', updatedData, {

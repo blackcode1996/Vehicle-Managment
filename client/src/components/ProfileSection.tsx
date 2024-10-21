@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import NoAvatar from "../assets/noAvatar.jpg";
-import { AppDispatch } from "../redux/store";
 import {
   getProfile,
   updateProfile,
@@ -12,9 +11,10 @@ import {
 } from "../redux/slice/profileSlice";
 import { profileValidationSchema } from "../utils/Validation";
 import ProfileSkeleton from "./Skeletons/ProfileSkeleton";
+import { useAppDispatch } from "../hooks/useAppDispatch";
 
 const Profile = () => {
-  const dispatch: AppDispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const profile = useSelector(userData);
   const loading = useSelector(userLoading);

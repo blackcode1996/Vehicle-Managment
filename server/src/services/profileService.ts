@@ -3,6 +3,15 @@ import prisma from '../models/index'
 const getProfile = async (id: string | undefined) => {
     return await prisma.user.findUnique({
         where: { id },
+        select:{
+            id: true,
+            name: true,
+            email: true,
+            phone: true,
+            address: true,
+            avatar: true,
+            role: true
+        }
     });
 };
 
