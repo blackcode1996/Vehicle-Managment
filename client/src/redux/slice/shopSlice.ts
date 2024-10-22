@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
 import { getLocalStorage } from "../../utils/LocalStorage";
+import axiosInstance from "../../utils/axiosInstance";
 
 interface Shop {
   id: string;
@@ -40,12 +40,12 @@ export const getShop = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const token = getLocalStorage("userToken") || "";
-      const response = await axios.get('/api/shop', {
+      const response = await axiosInstance.get('/api/shop', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      return response.data;
+      return response.data.shops;
     } catch (error: any) {
       return rejectWithValue(error.response?.data || "Something went wrong");
     }
@@ -58,7 +58,7 @@ export const updateShop = createAsyncThunk(
   async ({ shopId, shopData }: { shopId: string; shopData: Omit<Shop, 'id' | 'userId'> }, { rejectWithValue }) => {
     try {
       const token = getLocalStorage("userToken") || "";
-      const response = await axios.put(`/api/shop/${shopId}`, shopData, {
+      const response = await axiosInstance.put(`/api/shop/${shopId}`, shopData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

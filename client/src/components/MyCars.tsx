@@ -1,13 +1,23 @@
 import { useEffect, useState } from "react";
 import { useAppDispatch } from "../hooks/useAppDispatch";
-import { getVehicles, vehicleData, updateCar } from "../redux/slice/carsSlice";
+import {
+  getVehicles,
+  vehicleData,
+  updateCar,
+  deleteCar,
+  vehicleLoading,
+  vehicleError,
+} from "../redux/slice/carsSlice";
 import { useSelector } from "react-redux";
 import Modal from "./Modal";
-import imageCompression from "browser-image-compression";
+import ImageUpload from "./ImageUpload";
+import CarSkeleton from "./Skeletons/CarSkeleton";
 
 const MyCars = () => {
   const dispatch = useAppDispatch();
   const vehicles = useSelector(vehicleData);
+  const vehicleDataLoading = useSelector(vehicleLoading);
+  const vehicleDataError = useSelector(vehicleError);
   const [showModal, setShowModal] = useState(false);
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
@@ -26,11 +36,9 @@ const MyCars = () => {
   const openModalWithData = (vehicle: any) => {
     setFormData({
       registrationNumber: vehicle.registrationNumber,
-      perHourCharge: vehicle.perHourCharge,
+      perHourCharge: vehicle.perHourCharge.toString(),
       fuelType: vehicle.fuelType,
     });
-    setSelectedImages(vehicle.vehicleImg); // Assuming these are URLs or paths
-    setImagePreviews(vehicle.vehicleImg); // Assuming these are URLs or paths
     setOriginalData(vehicle);
     setCurrentVehicleId(vehicle.id);
     setShowModal(true);
@@ -41,32 +49,14 @@ const MyCars = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files) {
-      const fileArray = Array.from(files);
-      // Compress images if needed
-      const compressedImages = await Promise.all(
-        fileArray.map(async (file) => {
-          const options = { maxSizeMB: 1, useWebWorker: true }; // Example options
-          return await imageCompression(file, options);
-        })
-      );
-      setSelectedImages(compressedImages);
-      setImagePreviews(
-        compressedImages.map((file) => URL.createObjectURL(file))
-      );
-    }
-  };
-
   const hasChanges = () => {
     return (
       JSON.stringify(formData) !==
         JSON.stringify({
           registrationNumber: originalData?.registrationNumber,
-          perHourCharge: originalData?.perHourCharge,
+          perHourCharge: originalData?.perHourCharge.toString(),
           fuelType: originalData?.fuelType,
-        }) || selectedImages.length !== originalData?.vehicleImg.length
+        }) || selectedImages.length
     );
   };
 
@@ -85,23 +75,31 @@ const MyCars = () => {
     dispatch(
       updateCar({ id: currentVehicleId, updatedCarData: updatedFormData })
     ).then(() => {
-      dispatch(getVehicles());
+      dispatch(getVehicles()); // Fetch updated vehicles after edit
     });
 
     setShowModal(false);
   };
 
+  const deleteCarData = (id: string) => {
+    dispatch(deleteCar({ id: id }));
+  };
+
   return (
     <div>
-      {vehicles &&
+      {vehicleDataLoading && <CarSkeleton />}
+
+      {vehicleDataError && (
+        <p className="text-red-500 text-center my-4">{vehicleDataError}</p>
+      )}
+
+      {!vehicleDataLoading &&
+        !vehicleDataError &&
+        vehicles &&
         vehicles.map((el) => (
-          <a
-            href="#"
-            className="group relative block overflow-hidden"
-            key={el.id}
-          >
+          <div className="group relative block overflow-hidden" key={el.id}>
             <img
-              src={el.vehicleImg[0]} // Assuming vehicleImg[0] is the main image URL
+              src={el.vehicleImg[0]}
               alt={el.registrationNumber}
               className="h-64 w-full object-cover transition duration-500 group-hover:scale-105 sm:h-72"
             />
@@ -114,7 +112,10 @@ const MyCars = () => {
                 {el.model.description}
               </p>
               <form className="mt-4 flex gap-4">
-                <button className="block w-full rounded bg-secondary px-4 py-3 text-sm font-medium text-neutral transition hover:scale-105">
+                <button
+                  onClick={() => deleteCarData(el.id)}
+                  className="block w-full rounded bg-secondary px-4 py-3 text-sm font-medium text-neutral transition hover:scale-105"
+                >
                   Delete Car
                 </button>
                 <button
@@ -126,7 +127,7 @@ const MyCars = () => {
                 </button>
               </form>
             </div>
-          </a>
+          </div>
         ))}
 
       {showModal && (
@@ -158,6 +159,7 @@ const MyCars = () => {
                   >
                     Per Hour Charge
                   </label>
+
                   <input
                     name="perHourCharge"
                     value={formData.perHourCharge}
@@ -182,37 +184,16 @@ const MyCars = () => {
                     type="text"
                     className="bg-[#fff] border border-secondary text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5"
                     placeholder="PETROL"
+                    autoCapitalize="on"
                   />
                 </div>
 
                 {/* Image Upload */}
-                {/* <ImageUpload
-                    selectedImages={selectedImages}
-                    setSelectedImages={setSelectedImages}
-                  /> */}
-
-                <div>
-                  <label>Upload Images</label>
-                  <input
-                    type="file"
-                    multiple
-                    accept="image/*"
-                    onChange={handleFileChange}
-                  />
-                </div>
-                <div className="image-previews">
-                  {imagePreviews.map((image, index) => (
-                    <img
-                      key={index}
-                      src={image}
-                      alt={`Preview ${index}`}
-                      className="w-20 h-20 object-cover"
-                    />
-                  ))}
-                </div>
-
-                
-                <button type="submit">Save Changes</button>
+                <ImageUpload
+                  setSelectedImages={setSelectedImages}
+                  imagePreviews={imagePreviews}
+                  setImagePreviews={setImagePreviews}
+                />
 
                 <div className="flex justify-end mt-4">
                   <button
@@ -222,7 +203,7 @@ const MyCars = () => {
                     }`}
                     disabled={!hasChanges()}
                   >
-                    Save
+                    Save Changes
                   </button>
                 </div>
               </div>
@@ -235,21 +216,3 @@ const MyCars = () => {
 };
 
 export default MyCars;
-
-{
-  /* <div>
-              <label>Upload Images</label>
-              <input
-                type="file"
-                multiple
-                accept="image/*"
-                onChange={handleFileChange}
-              />
-            </div>
-            <div className="image-previews">
-              {imagePreviews.map((image, index) => (
-                <img key={index} src={image} alt={`Preview ${index}`} className="w-20 h-20 object-cover" />
-              ))}
-            </div>
-            <button type="submit">Save Changes</button> */
-}

@@ -19,8 +19,6 @@ const Login = () => {
   const isError = useSelector(userError);
   const usersData = useSelector(userData);
 
-  console.log(usersData);
-
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -38,10 +36,6 @@ const Login = () => {
   });
 
   useEffect(() => {
-    console.log("isLoading:", isLoading);
-    console.log("isError:", isError);
-    console.log("usersData:", usersData);
-
     if (!isLoading && !isError && usersData) {
       const role = usersData?.role;
       if (role === "CUSTOMER") {

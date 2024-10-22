@@ -3,18 +3,19 @@ import { toast } from 'react-toastify';
 
 const axiosInstance = axios.create();
 
-axiosInstance.interceptors.request.use(
-  (config) => {
-    toast.info('Loading...');
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
+// axiosInstance.interceptors.request.use(
+//   (config) => {
+//     toast.info('Loading...');
+//     return config;
+//   },
+//   (error) => {
+//     return Promise.reject(error);
+//   }
+// );
 
 axiosInstance.interceptors.response.use(
   (response) => {
+    console.log(response);
     toast.success(response.data.message);
     return response;
   },

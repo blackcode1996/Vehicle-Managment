@@ -1,67 +1,81 @@
-import { useCallback } from 'react';
-import { useDropzone } from 'react-dropzone';
+import React, { useCallback } from "react";
+import { useDropzone } from "react-dropzone";
 
-const ImageUpload = ({ selectedImages, setSelectedImages }: { selectedImages: any, setSelectedImages: any }) => {
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    const imagePromises: Promise<string>[] = acceptedFiles.map((image) => {
-      return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          resolve(reader.result as string);
-        };
-        reader.readAsDataURL(image);
-      });
-    });
+interface ImageUploadProps {
+  setSelectedImages: React.Dispatch<React.SetStateAction<File[]>>;
+  imagePreviews: string[];
+  setImagePreviews: React.Dispatch<React.SetStateAction<string[]>>;
+}
 
-    Promise.all(imagePromises).then((results) => {
-      setSelectedImages([...selectedImages, ...results]);
-    });
-  }, [selectedImages, setSelectedImages]);
+const ImageUpload: React.FC<ImageUploadProps> = ({
+  setSelectedImages,
+  imagePreviews,
+  setImagePreviews,
+}) => {
+  const handleImageUpload = useCallback(
+    async (acceptedFiles: File[]) => {
+      const compressedImages = await Promise.all(
+        acceptedFiles.map(async (file) => {
+          return file;
+        })
+      );
 
-  const { getRootProps, getInputProps } = useDropzone({
-    onDrop,
-    accept: { 'image/*': [] },
-    multiple: true,
-    type: file
+      setSelectedImages((prev) => [...prev, ...compressedImages]);
+      const newPreviews = compressedImages.map((file) =>
+        URL.createObjectURL(file)
+      );
+      setImagePreviews((prev) => [...prev, ...newPreviews]);
+    },
+    [setSelectedImages, setImagePreviews]
+  );
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop: handleImageUpload,
+    accept: { "image/*": [] },
   });
 
   const handleRemoveImage = (index: number) => {
-    const updatedImages = selectedImages.filter((_: string, i: number) => i !== index);
-    setSelectedImages(updatedImages);
+    setSelectedImages((prev) => prev.filter((_, i) => i !== index));
+    setImagePreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
   return (
-    <div>
+    <div className="image-upload-container">
+      {/* Drag and drop area */}
       <div
         {...getRootProps()}
-        className="dropzone text-center border-dashed border-2 border-secondary p-6 rounded-md"
+        className={`border-dashed border-2 p-8 rounded-lg ${
+          isDragActive ? "border-primary" : "border-secondary"
+        } cursor-pointer text-center`}
       >
         <input {...getInputProps()} />
-        <p className="text-primary">Drag 'n' drop images here, or click to select</p>
+        {isDragActive ? (
+          <p className="text-primary">Drop the files here...</p>
+        ) : (
+          <p className="text-primary">
+            Drag 'n' drop some images here, or click to select files
+          </p>
+        )}
       </div>
 
-      {selectedImages.length > 0 && (
-        <div className="mt-4">
-          <h2 className="text-xl font-semibold mb-2">Selected Images</h2>
-          <div className="flex flex-wrap">
-            {selectedImages.map((image: string, index: number) => (
-              <div key={index} className="relative m-2">
-                <img
-                  src={image}
-                  alt={`Selected ${index + 1}`}
-                  className="w-[100px] h-[100px] object-cover rounded-md"
-                />
-                <button
-                  onClick={() => handleRemoveImage(index)}
-                  className="absolute top-[-5px] right-[-5px] bg-secondary text-neutral rounded-full w-5 h-5 flex items-center justify-center text-xs"
-                >
-                  &times;
-                </button>
-              </div>
-            ))}
+      {/* Image previews */}
+      <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+        {imagePreviews.map((preview, index) => (
+          <div key={index} className="relative">
+            <img
+              src={preview}
+              alt={`preview-${index}`}
+              className="object-cover w-full h-32 rounded-lg"
+            />
+            <button
+              onClick={() => handleRemoveImage(index)}
+              className="absolute w-[30px] h-[30px] text-2xl top-[-5px] right-[-5px] bg-secondary text-white rounded-[50%]"
+            >
+              &times;
+            </button>
           </div>
-        </div>
-      )}
+        ))}
+      </div>
     </div>
   );
 };

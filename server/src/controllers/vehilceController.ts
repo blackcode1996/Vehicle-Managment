@@ -44,7 +44,7 @@ export const getAllVehicles = async (req: Request, res: Response) => {
         });
 
         // Return the result
-        return res.status(200).json(vehicles);
+        return res.status(200).json({message:"Vehicles received successfully",vehicles});
     } catch (error: any) {
         return res.status(500).json({ error: error.message });
     }

@@ -64,8 +64,6 @@ const verifyOTP = async (email: string, userOTP: string) => {
     }
 
     if (!user.otpExpiresAt || user.otpExpiresAt < new Date()) {
-        console.log(new Date());
-        console.log(user.otpExpiresAt);
         throw new Error('OTP has expired. Please request a new one.');
     }
 

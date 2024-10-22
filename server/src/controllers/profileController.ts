@@ -16,7 +16,7 @@ export const getProfile = async (req: Request, res: Response) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        res.status(200).json(profile);
+        res.status(201).json({ message: 'Profile received successfully.', profile });
     } catch (error: any) {
         res.status(500).json({ error: error.message });
     }
@@ -36,9 +36,17 @@ export const updateProfile = async (req: Request, res: Response) => {
 
         const { name, phone, address } = req.body;
         const file = req.file;
-        const avatar = file ? await uploadSingleImage(file.buffer) : null;
 
-        const updatedData = { name, phone, address, avatar };
+        const updatedData: any = {};
+
+        if (name) updatedData.name = name;
+        if (phone) updatedData.phone = phone;
+        if (address) updatedData.address = address;
+
+        if (file) {
+            const avatar = await uploadSingleImage(file.buffer);
+            updatedData.avatar = avatar;
+        }
 
         const updatedProfile = await profileService.updateProfile(userId, updatedData);
 
@@ -48,6 +56,7 @@ export const updateProfile = async (req: Request, res: Response) => {
         res.status(500).json({ error: error.message || 'An error occurred while updating the profile' });
     }
 };
+
 
 export const getAllProfiles = async (req: Request, res: Response) => {
     try {
@@ -105,8 +114,8 @@ export const resetPassword = async (req: Request, res: Response) => {
         }
 
         const user = await profileService.getUserById(userId);
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+        if (!user || !user.password) {
+            return res.status(404).json({ message: 'User not found or invalid password' });
         }
 
         const passwordMatch = await bcrypt.compare(oldPassword, user.password);

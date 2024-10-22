@@ -24,7 +24,6 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
 export const authorizeRole = (roles: string[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.user || !('role' in req.user) || !roles.includes(req.user.role as string)) {
-      console.log("role", req?.user)
       return res.status(403).json({ error: 'Access denied: insufficient role' });
     }
     next();

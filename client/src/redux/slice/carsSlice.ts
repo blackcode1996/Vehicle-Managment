@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import axios from 'axios';
 import { getLocalStorage } from '../../utils/LocalStorage';
-import { userData } from './authSlice';
+import axiosInstance from '../../utils/axiosInstance';
 
 interface VehicleData {
   id: string;
@@ -41,19 +40,18 @@ const initialState: VehicleState = {
 };
 
 interface RootState {
-    vehicle: VehicleState; 
+  vehicle: VehicleState;
 }
 
 export const getVehicles = createAsyncThunk('/api/vehicles', async (_, { rejectWithValue }) => {
   try {
     const token = getLocalStorage('userToken') || '';
-    const response = await axios.get('/api/vehicles', {
+    const response = await axiosInstance.get('/api/vehicles', {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log(response);
-    return response.data;
+    return response.data.vehicles;
   } catch (error: any) {
     return rejectWithValue(error.response.data);
   }
@@ -64,8 +62,7 @@ export const updateCar = createAsyncThunk(
   async ({ id, updatedCarData }: { id: string; updatedCarData: Partial<VehicleData> }, { rejectWithValue }) => {
     try {
       const token = getLocalStorage('userToken') || '';
-      console.log({updatedCarData});
-      const response = await axios.put(`/api/vehicles/${id}`, updatedCarData, {
+      const response = await axiosInstance.put(`/api/vehicles/${id}`, updatedCarData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`,
@@ -78,14 +75,29 @@ export const updateCar = createAsyncThunk(
   }
 );
 
-
+export const deleteCar = createAsyncThunk(
+  'vehicle/deleteCar',
+  async ({ id }: { id: string }, { rejectWithValue }) => {
+    try {
+      const token = getLocalStorage('userToken') || '';
+      const response = await axiosInstance.delete(`/api/vehicles/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
 
 const vehicleSlice = createSlice({
   name: 'vehicle',
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    // Add car logic
+    // Fetch vehicles logic
     builder
       .addCase(getVehicles.pending, (state) => {
         state.loading = true;
@@ -108,11 +120,11 @@ const vehicleSlice = createSlice({
         state.error = null;
         state.success = false;
       })
-      .addCase(updateCar.fulfilled, (state, action: PayloadAction<{ data: VehicleData }>) => {
+      .addCase(updateCar.fulfilled, (state, action: PayloadAction<VehicleData>) => {
         if (state.vehicleData) {
-          const index = state.vehicleData.findIndex(car => car.id === action.payload.data.id);
+          const index = state.vehicleData.findIndex(car => car.id === action.payload.id);
           if (index !== -1) {
-            state.vehicleData[index] = action.payload.data;
+            state.vehicleData[index] = action.payload; // Update the specific vehicle in state
           }
         }
         state.loading = false;
@@ -122,13 +134,30 @@ const vehicleSlice = createSlice({
         state.loading = false;
         state.error = action.payload.message || 'Failed to update vehicle';
         state.success = false;
+      })
+      // Delete car logic
+      .addCase(deleteCar.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.success = false;
+      })
+      .addCase(deleteCar.fulfilled, (state, action: PayloadAction<{ id: string }>) => {
+        if (state.vehicleData) {
+          state.vehicleData = state.vehicleData.filter(car => car.id !== action.payload.id);
+        }
+        state.loading = false;
+        state.success = true;
+      })
+      .addCase(deleteCar.rejected, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error = action.payload.message || 'Failed to delete vehicle';
+        state.success = false;
       });
   },
 });
 
-
-export const vehicleData=(state: RootState)=>state.vehicle.vehicleData;
-export const vehicleLoading = (state: RootState)=> state.vehicle.loading;
-export const vehicleError = (state: RootState)=>state.vehicle.error;
+export const vehicleData = (state: RootState) => state.vehicle.vehicleData;
+export const vehicleLoading = (state: RootState) => state.vehicle.loading;
+export const vehicleError = (state: RootState) => state.vehicle.error;
 
 export default vehicleSlice.reducer;

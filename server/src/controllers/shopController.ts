@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import {
     createShopService,
     getShopsService,
-    updateShopService, 
+    updateShopService,
     deleteShopService,
     getShopByIdService
 } from '../services/shopService';
@@ -47,7 +47,7 @@ export const getShops = async (req: Request, res: Response) => {
             sortField: String(sortField),
             sortOrder: sortOrder === 'asc' || sortOrder === 'desc' ? sortOrder : 'asc',
         });
-        return res.status(200).json(shops);
+        return res.status(201).json({message:"Shops received successfully",shops});
     } catch (error: any) {
         res.status(500).json({ message: 'Error fetching shops', error: error.message });
     }
@@ -64,7 +64,7 @@ export const updateShop = async (req: Request, res: Response) => {
     }
 
     try {
-        const shop = await getShopByIdService(id); 
+        const shop = await getShopByIdService(id);
 
         if (!shop) {
             return res.status(404).json({ message: 'Shop not found.' });

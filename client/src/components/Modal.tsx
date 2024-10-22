@@ -22,7 +22,7 @@ const Modal: React.FC<ModalType> = ({ isOpen, onClose, children }) => {
       >
         <button
           onClick={onClose}
-          className="absolute top-2 right-2 bg-secondary text-neutral rounded-full w-8 h-8 flex items-center justify-center text-sm"
+          className="absolute text-2xl top-[5px] right-[5px] bg-secondary text-neutral rounded-full w-8 h-8 flex items-center justify-center"
         >
           ✕
         </button>
