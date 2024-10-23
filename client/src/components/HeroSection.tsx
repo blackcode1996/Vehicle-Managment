@@ -1,6 +1,6 @@
 import playStore from "../assets/playStore.png";
 import iosStore from "../assets/ios.png";
-import Homepng from "../assets/pngwing1.com.png";
+import Homepng from "../assets/img1.png";
 
 const HeroSection = () => {
   return (
