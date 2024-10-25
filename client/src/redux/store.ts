@@ -5,6 +5,8 @@ import shopSlice from "./slice/shopSlice";
 import vehicleSlice from "./slice/carsSlice";
 import brandReducer from "./slice/brandSlice";
 import modelReducer from './slice/modelSlice';
+import filterReducer from './slice/filterSortSlice';
+
 
 const store = configureStore({
     reducer: {
@@ -14,6 +16,7 @@ const store = configureStore({
         vehicle: vehicleSlice,
         brand: brandReducer,
         model: modelReducer,
+        filter: filterReducer
     },
 });
 

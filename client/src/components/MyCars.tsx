@@ -81,6 +81,7 @@ const MyCars = () => {
             shopDetails={el.Shop}
             bookingStatus={el.bookedStatus}
             openModalWithData={openModalWithData} 
+            deleteEditButton={true}
           />
         ))}
 

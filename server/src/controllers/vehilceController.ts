@@ -31,35 +31,47 @@ export const createVehicle = async (req: Request, res: Response) => {
     }
 };
 
+
 export const getAllVehicles = async (req: Request, res: Response) => {
-    try {
-        const { page = 1, limit = 10, search = '', sortField = 'registrationNumber', sortOrder = 'asc' } = req.query;
-        const { user } = req;  
+  try {
+    const {
+      page = 1, 
+      limit = 10, 
+      search = '', 
+      sortField = 'registrationNumber', 
+      sortOrder = 'asc', 
+      brand, 
+      model, 
+    } = req.query;
 
-        const parsedPage = parseInt(page as string, 10);
-        const parsedLimit = parseInt(limit as string, 10);
+    const { user } = req;
 
-        let adminId: string | null = null;
+    const parsedPage = parseInt(page as string, 10);
+    const parsedLimit = parseInt(limit as string, 10);
 
+    let adminId: string | null = null;
 
-        if (user && user?.role === UserRole.ADMIN) {
-            adminId = user?.userId;  
-        }
-
-        const vehicles = await vehicleService.getAllVehiclesService({
-            page: parsedPage,
-            limit: parsedLimit,
-            search: search as string,
-            sortField: sortField as string,
-            sortOrder: sortOrder as 'asc' | 'desc',
-            adminId,  
-        });
-
-        return res.status(200).json({ message: "Vehicles received successfully", vehicles });
-    } catch (error: any) {
-        return res.status(500).json({ error: error.message });
+    if (user && user.role === UserRole.ADMIN) {
+      adminId = user.userId;
     }
+
+    const vehicles = await vehicleService.getAllVehiclesService({
+      page: parsedPage,
+      limit: parsedLimit,
+      search: search as string,
+      sortField: sortField as string,
+      sortOrder: sortOrder as 'asc' | 'desc',
+      adminId,
+      brand: brand as string,
+      model: model as string,
+    });
+
+    return res.status(200).json({ message: "Vehicles received successfully", vehicles });
+  } catch (error: any) {
+    return res.status(500).json({ error: error.message });
+  }
 };
+
 
 
 

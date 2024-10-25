@@ -3,25 +3,14 @@ import AnimatedSvgBackground from "./AnimatedSvgBackground";
 import { useSelector } from "react-redux";
 import { getModels, modelData } from "../redux/slice/modelSlice";
 import CustomDropdown from "./CustomDropdown";
-import delhi from "../assets/delhi.webp";
-import kolkata from "../assets/kolkata.webp";
-import Bengaluru from "../assets/bangalore.webp";
-import Mumbai from "../assets/mumbai.webp";
-import Goa from "../assets/goa.jpg";
 import { useAppDispatch } from "../hooks/useAppDispatch";
+import { locations } from "../utils/location";
 
 const BookaCar = () => {
   const models: any = useSelector(modelData);
   const dispatch = useAppDispatch();
   const [selectedModel, setSelectedModel] = useState<any>(null);
 
-  const locations = [
-    { id: "delhi", name: "Delhi", modelImg: delhi },
-    { id: "kolkata", name: "Kolkata", modelImg: kolkata },
-    { id: "bengaluru", name: "Bengaluru", modelImg: Bengaluru },
-    { id: "mumbai", name: "Mumbai", modelImg: Mumbai },
-    { id: "goa", name: "Goa", modelImg: Goa },
-  ];
 
   const [selectedPickupLocation, setSelectedPickupLocation] =
     useState<any>(null);

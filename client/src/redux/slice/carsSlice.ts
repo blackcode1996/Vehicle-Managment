@@ -43,20 +43,23 @@ interface RootState {
   vehicle: VehicleState;
 }
 
-export const getVehicles = createAsyncThunk('/api/vehicles', async (_, { rejectWithValue }) => {
-  try {
-    const token = getLocalStorage('userToken') || '';
-    console.log(token);
-    const response = await axiosInstance.get('/api/vehicles', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
-  } catch (error: any) {
-    return rejectWithValue(error.response.data);
+export const getVehicles = createAsyncThunk(
+  'vehicle/getVehicles',
+  async ({ page = 1, limit = 4, search = '', sortField = 'perHourCharge', sortOrder = 'desc', brand = '', model = '' }: { page?: number; limit?: number; search?: string; sortField?: string; sortOrder?: string; brand?: string; model?: string }, { rejectWithValue }) => {
+    try {
+      const token = getLocalStorage('userToken') || '';
+      const response = await axiosInstance.get('/api/vehicles', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: { page, limit, search, sortField, sortOrder, brand, model },
+      });
+      return response.data; 
+    } catch (error: any) {
+      return rejectWithValue(error.response.data);
+    }
   }
-});
+);
 
 export const updateCar = createAsyncThunk(
   'vehicle/updateCar',
@@ -105,7 +108,7 @@ export const addCar = createAsyncThunk(
           Authorization: `Bearer ${token}`,
         },
       });
-      return response.data; 
+      return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response.data);
     }
@@ -181,7 +184,7 @@ const vehicleSlice = createSlice({
       })
       .addCase(addCar.fulfilled, (state, action: PayloadAction<VehicleData>) => {
         if (state.vehicleData) {
-          state.vehicleData.push(action.payload); 
+          state.vehicleData.push(action.payload);
         } else {
           state.vehicleData = [action.payload];
         }

@@ -28,7 +28,7 @@ const Header = () => {
 
   useEffect(() => {
     setUserData(user);
-  }, [user]);
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {

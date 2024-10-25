@@ -56,21 +56,27 @@ export const getAllVehiclesService = async ({
   search,
   sortField = 'registrationNumber',
   sortOrder = 'asc',
-  adminId = null,  
+  adminId = null,
+  brand,
+  model,
 }: {
   page: number;
   limit: number;
   search: string;
   sortField: string;
   sortOrder: 'asc' | 'desc';
-  adminId?: string | null;  
+  adminId?: string | null;
+  brand?: string;
+  model?: string;
 }) => {
   const skip = (page - 1) * limit;
 
   const processedSearch = search ? search.replace(/[^a-zA-Z0-9]/g, '') : '';
 
-
   const where: Prisma.VehicleWhereInput = {
+    ...(adminId && {
+      adminId,
+    }),
     ...(search && {
       OR: [
         {
@@ -80,16 +86,30 @@ export const getAllVehiclesService = async ({
           registrationNumber: { contains: processedSearch, mode: Prisma.QueryMode.insensitive },
         },
         {
-          model: { name: { contains: search, mode: Prisma.QueryMode.insensitive } },
+          model: {
+            name: { contains: search, mode: Prisma.QueryMode.insensitive },
+          },
+        },
+        {
+          model: {
+            description: { contains: search, mode: Prisma.QueryMode.insensitive },
+          },
         },
       ],
     }),
-    ...(adminId && {
-      adminId
+    ...(brand && {
+      model: {
+        brand: {
+          name: { contains: brand, mode: Prisma.QueryMode.insensitive }, 
+        },
+      },
+    }),
+    ...(model && {
+      model: {
+        name: { contains: model, mode: Prisma.QueryMode.insensitive },
+      },
     }),
   };
-
-  console.log(where);
 
   const vehicles = await prisma.vehicle.findMany({
     where,
@@ -151,7 +171,7 @@ export const updateVehicleService = async (
     if (shopId) updateData.Shop = { connect: { id: shopId } };
     if (perHourCharge) updateData.perHourCharge = perHourCharge;
     if (fuelType) updateData.fuelType = fuelType;
-    
+
     if (vehicleImg && vehicleImg.length > 0) {
       updateData.vehicleImg = { set: vehicleImg };
     }
