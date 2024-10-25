@@ -11,7 +11,7 @@ const router = express.Router();
 
 
 router.post('/', authenticate, authorizeRole(["ADMIN", "SUPER_ADMIN"]), createShop);
-router.get('/', getShops);
+router.get('/',authenticate, getShops);
 router.put('/:id', authenticate,authorizeRole(["ADMIN", "SUPER_ADMIN"]),updateShop);
 router.delete('/:id',authenticate,authorizeRole(["ADMIN", "SUPER_ADMIN"]), deleteShop); 
 

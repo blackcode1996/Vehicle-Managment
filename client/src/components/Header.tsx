@@ -3,8 +3,12 @@ import { FaUser, FaBars, FaTimes } from "react-icons/fa";
 import logo from "../assets/logo.png";
 import car from "../assets/car.gif";
 import carProfile from "../assets/carProfile.png";
-import { Link } from "react-router-dom";
-import { getLocalStorage, setLocalStorage } from "../utils/LocalStorage";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  clearLocalStorage,
+  getLocalStorage,
+  setLocalStorage,
+} from "../utils/LocalStorage";
 
 const navLinks = [
   { title: "Home", url: "/" },
@@ -20,15 +24,16 @@ const Header = () => {
   const [showModal, setShowModal] = useState(false);
   const [userData, setUserData] = useState({});
   const user = getLocalStorage("user");
+  const navigate = useNavigate();
 
-  console.log({ user });
+  useEffect(() => {
+    setUserData(user);
+  }, [user]);
 
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 769);
     };
-
-    setUserData(user);
 
     window.addEventListener("resize", handleResize);
 
@@ -43,6 +48,11 @@ const Header = () => {
 
   const handleBarsIconClick = () => {
     toggleModal();
+  };
+
+  const handleLogout = () => {
+    clearLocalStorage();
+    navigate("/login");
   };
 
   return (
@@ -93,11 +103,19 @@ const Header = () => {
                       </button>
                     </Link>
                   ) : (
-                    <Link to="/profile">
-                      <button className="w-full bg-red-500 text-white font-bold py-2 px-4 rounded-full hover:bg-red-700 transition-all duration-300">
-                        Your Profile
+                    <>
+                      <Link to="/profile">
+                        <button className="w-full text-white font-bold py-2 px-4 rounded-full">
+                          Your Profile
+                        </button>
+                      </Link>
+                      <button
+                        onClick={handleLogout}
+                        className="w-full bg-secondary text-white font-bold py-2 px-4 rounded-full"
+                      >
+                        Logout
                       </button>
-                    </Link>
+                    </>
                   )}
                 </div>
               </ul>

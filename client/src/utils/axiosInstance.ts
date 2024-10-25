@@ -15,12 +15,10 @@ const axiosInstance = axios.create();
 
 axiosInstance.interceptors.response.use(
   (response) => {
-    console.log(response);
     toast.success(response.data.message);
     return response;
   },
   (error) => {
-    console.log(error.response.data.error);
     if (error.response) {
       toast.error(error.response.data.error);
     } else {

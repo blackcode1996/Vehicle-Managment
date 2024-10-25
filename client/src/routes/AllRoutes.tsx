@@ -8,6 +8,7 @@ import Seller from "../pages/Seller";
 import Vehicles from "../pages/Vehicles";
 import PrivateRoutes from "../hoc/privateRoutes";
 import Profile from "../pages/Profile";
+import PageNotFound from "../components/PageNotFound";
 
 const router = createBrowserRouter([
   {
@@ -40,12 +41,16 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "/vehilcles",
+        path: "/vehicles",
         element: <Vehicles />,
       },
       {
         path:"/profile",
         element: <Profile/>
+      },
+      {
+        path:"*",
+        element: <PageNotFound/>
       }
     ],
   },

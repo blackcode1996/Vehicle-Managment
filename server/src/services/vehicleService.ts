@@ -56,20 +56,22 @@ export const getAllVehiclesService = async ({
   search,
   sortField = 'registrationNumber',
   sortOrder = 'asc',
+  adminId = null,  
 }: {
   page: number;
   limit: number;
   search: string;
   sortField: string;
   sortOrder: 'asc' | 'desc';
+  adminId?: string | null;  
 }) => {
   const skip = (page - 1) * limit;
 
   const processedSearch = search ? search.replace(/[^a-zA-Z0-9]/g, '') : '';
 
-  // Prepare the "where" clause
-  const where: Prisma.VehicleWhereInput = search
-    ? {
+
+  const where: Prisma.VehicleWhereInput = {
+    ...(search && {
       OR: [
         {
           registrationNumber: { contains: search, mode: Prisma.QueryMode.insensitive },
@@ -81,8 +83,13 @@ export const getAllVehiclesService = async ({
           model: { name: { contains: search, mode: Prisma.QueryMode.insensitive } },
         },
       ],
-    }
-    : {};
+    }),
+    ...(adminId && {
+      adminId
+    }),
+  };
+
+  console.log(where);
 
   const vehicles = await prisma.vehicle.findMany({
     where,
@@ -105,6 +112,7 @@ export const getAllVehiclesService = async ({
     currentPage: page,
   };
 };
+
 
 export const getVehicleByIdService = async (id: string) => {
   return await prisma.vehicle.findUnique({
@@ -136,22 +144,27 @@ export const updateVehicleService = async (
   }
 ) => {
   try {
+    const updateData: any = {};
+
+    if (registrationNumber) updateData.registrationNumber = registrationNumber;
+    if (modelId) updateData.model = { connect: { id: modelId } };
+    if (shopId) updateData.Shop = { connect: { id: shopId } };
+    if (perHourCharge) updateData.perHourCharge = perHourCharge;
+    if (fuelType) updateData.fuelType = fuelType;
+    
+    if (vehicleImg && vehicleImg.length > 0) {
+      updateData.vehicleImg = { set: vehicleImg };
+    }
+
     const vehicle = await prisma.vehicle.update({
       where: { id },
-      data: {
-        registrationNumber,
-        model: modelId ? { connect: { id: modelId } } : undefined,
-        Shop: shopId ? { connect: { id: shopId } } : undefined,
-        perHourCharge,
-        fuelType,
-        vehicleImg: vehicleImg ? { set: vehicleImg } : undefined,
-      },
+      data: updateData,
       include: {
         model: true,
         admin: true,
         Shop: true,
         bookings: true,
-      }
+      },
     });
 
     return vehicle;

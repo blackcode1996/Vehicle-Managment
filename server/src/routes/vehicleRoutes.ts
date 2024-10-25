@@ -7,7 +7,7 @@ const router = express.Router();
 
 
 router.post('/', authenticate, authorizeRole(['ADMIN', 'SUPER_ADMIN']), upload.array('vehicleImg'), createVehicle);
-router.get('/', getAllVehicles);
+router.get('/',authenticate, getAllVehicles);
 router.get('/:id', getVehicleById);
 router.put('/:id', authenticate, authorizeRole(['ADMIN', 'SUPER_ADMIN']), upload.array('vehicleImg'), updateVehicle);
 router.delete('/:id', authenticate, authorizeRole(['ADMIN', 'SUPER_ADMIN']), deleteVehicle);

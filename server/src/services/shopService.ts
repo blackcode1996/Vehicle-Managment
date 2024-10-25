@@ -18,23 +18,35 @@ export const getShopsService = async ({
     search,
     sortField = 'name',
     sortOrder = 'asc',
+    userRole, 
+    userId, 
 }: {
     page: number;
     limit: number;
     search: string;
     sortField: string;
     sortOrder: 'asc' | 'desc';
+    userRole: any;
+    userId: any; 
 }) => {
     const skip = (page - 1) * limit;
 
-    const where = search
-        ? {
+    const where: any = {
+        ...(search && {
             name: {
                 contains: search,
                 mode: Prisma.QueryMode.insensitive,
             },
-        }
-        : {};
+        }),
+    };
+
+    // Log the initial where condition
+    console.log("Initial where condition:", where);
+
+    if (userRole === 'ADMIN') {
+        where.userId = userId; // Assuming `userId` is the owner of the shop
+        console.log("Filtered for ADMIN, where condition:", where);
+    }
 
     const shops = await prisma.shop.findMany({
         where,
@@ -52,6 +64,7 @@ export const getShopsService = async ({
         currentPage: page,
     };
 };
+
 
 export const getShopByIdService = async (id: string) => {
     return await prisma.shop.findUnique({

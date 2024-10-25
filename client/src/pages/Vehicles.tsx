@@ -1,9 +1,46 @@
-import VehicelCard from "../components/VehicleCard";
-//import VehicleCardSkeleton from "../components/Skeletons/VehicleCardSkeleton";
-import Pagination from "../components/Pagination";
+import MyCarCard from "../components/VehicleCard";
+// import Pagination from "../components/Pagination";
 import DatePicker from "../components/DatePicker";
+import { useAppDispatch } from "../hooks/useAppDispatch";
+import { useEffect } from "react";
+import {
+  getVehicles,
+  vehicleData,
+  vehicleError,
+  vehicleLoading,
+} from "../redux/slice/carsSlice";
+import { useSelector } from "react-redux";
+import { getModels } from "../redux/slice/modelSlice";
+import { brandData, getBrands } from "../redux/slice/brandSlice";
 
 const Vehicles = () => {
+  const dispatch = useAppDispatch();
+  const vehicles = useSelector(vehicleData);
+  const vehicleDataLoading = useSelector(vehicleLoading);
+  const vehicleDataError = useSelector(vehicleError);
+
+  const brands = useSelector(brandData);
+
+  useEffect(() => {
+    console.log("Component mounted");
+    dispatch(getVehicles());
+    dispatch(getBrands());
+    dispatch(getModels());
+  }, [dispatch]);
+
+  useEffect(()=>{
+    console.log("mounted")
+  },[])
+
+  console.log("vehiclesData:", vehicles);
+  console.log("loading:", vehicleDataLoading);
+  console.log("error:", vehicleDataError);
+
+  console.log("Brand", brands);
+
+  if (vehicleDataLoading) return <p>Loading vehicles...</p>;
+  if (vehicleDataError)
+    return <p>Error fetching vehicles: {vehicleDataError}</p>;
   return (
     <div className="p-4">
       <div className="flex flex-col md:flex-row mt-4">
@@ -48,12 +85,12 @@ const Vehicles = () => {
 
           <div className="flex gap-4 w-full justify-between">
             <div>
-            <h3 className="font-semibold">From</h3>
+              <h3 className="font-semibold">From</h3>
               <DatePicker />
             </div>
 
             <div>
-            <h3 className="font-semibold">To</h3>
+              <h3 className="font-semibold">To</h3>
               <DatePicker />
             </div>
           </div>
@@ -78,24 +115,30 @@ const Vehicles = () => {
           </div>
 
           <div className="grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-3 place-items-center">
-            {/* {Array.from({ length: 6 }).map((_, index) => (
-              <VehicleCardSkeleton key={index} />
-            ))} */}
-            {/* Example of using ProductCard */}
-            <VehicelCard
-              productId="123"
-              productImage="/path/to/image"
-              productPrice={20000}
-              productDiscountPercent={10}
-              productTitle="Toyota Corolla"
-              productRating={4.5}
-              productActualPrice={22000}
-            />
+            {/* Dynamically rendering vehicles */}
+            {vehicles &&
+              vehicles?.map((vehicle) => (
+                <MyCarCard
+                  key={vehicle.id}
+                  // productId={vehicle.id}
+                  productImage={vehicle.vehicleImg[0] || vehicle.model.modelImg}
+                  productPrice={vehicle.perHourCharge}
+                  productDiscountPercent={0} 
+                  productTitle={vehicle.model.name}
+                  productRating={4.5} 
+                  productActualPrice={vehicle.perHourCharge} 
+                  carRegistrationNumber={vehicle.registrationNumber}
+                  carModelDescription={vehicle.model.description}
+                />
+              ))}
           </div>
         </main>
       </div>
 
-      <Pagination currentPage={1} totalPages={10} />
+      {/* <Pagination
+        currentPage={vehicles.currentPage}
+        totalPages={vehicles.totalPages}
+      /> */}
     </div>
   );
 };

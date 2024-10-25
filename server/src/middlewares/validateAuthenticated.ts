@@ -9,17 +9,23 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
-      userId: string; id: string; role: string
+      userId: string;
+      id: string; 
+      role: string;
     };
+
     req.user = {
-      userId: decoded.userId,
-      role: decoded.role as UserRole
+      id: decoded.id,         
+      userId: decoded.userId, 
+      role: decoded.role as UserRole 
     };
+
     next();
   } catch (err) {
     return res.status(403).json({ error: 'Invalid token' });
   }
 };
+
 
 export const authorizeRole = (roles: string[]) => {
   return (req: Request, res: Response, next: NextFunction) => {

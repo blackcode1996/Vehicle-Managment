@@ -32,7 +32,7 @@ export const getProfile = createAsyncThunk('profile/getProfile', async (_, { rej
     });
     return response.data.profile;
   } catch (error: any) {
-    return rejectWithValue(error.response.data);
+    return rejectWithValue(error.response.message);
   }
 });
 

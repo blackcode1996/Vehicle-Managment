@@ -38,6 +38,9 @@ export const createShop = async (req: Request, res: Response) => {
 
 export const getShops = async (req: Request, res: Response) => {
     const { page = 1, limit = 10, search = '', sortField = 'name', sortOrder = 'asc' } = req.query;
+    const userRole = req?.user?.role;
+    const adminId = req?.user?.userId;
+
 
     try {
         const shops = await getShopsService({
@@ -46,12 +49,16 @@ export const getShops = async (req: Request, res: Response) => {
             search: String(search),
             sortField: String(sortField),
             sortOrder: sortOrder === 'asc' || sortOrder === 'desc' ? sortOrder : 'asc',
+            userRole,
+            userId: adminId, 
         });
-        return res.status(201).json({message:"Shops received successfully",shops});
+
+        return res.status(200).json({ message: "Shops received successfully", shops });
     } catch (error: any) {
         res.status(500).json({ message: 'Error fetching shops', error: error.message });
     }
-}
+};
+
 
 export const updateShop = async (req: Request, res: Response) => {
     const { id } = req.params;

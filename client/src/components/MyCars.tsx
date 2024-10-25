@@ -3,90 +3,63 @@ import { useAppDispatch } from "../hooks/useAppDispatch";
 import {
   getVehicles,
   vehicleData,
-  updateCar,
-  deleteCar,
   vehicleLoading,
   vehicleError,
 } from "../redux/slice/carsSlice";
 import { useSelector } from "react-redux";
 import Modal from "./Modal";
-import ImageUpload from "./ImageUpload";
 import CarSkeleton from "./Skeletons/CarSkeleton";
+import { getBrands } from "../redux/slice/brandSlice";
+import { getModels } from "../redux/slice/modelSlice";
+import AddCar from "./AddCar";
+import MyCarCard from "./VehicleCard"; 
+import EditCar from "./EditCar"; 
 
 const MyCars = () => {
   const dispatch = useAppDispatch();
   const vehicles = useSelector(vehicleData);
   const vehicleDataLoading = useSelector(vehicleLoading);
   const vehicleDataError = useSelector(vehicleError);
-  const [showModal, setShowModal] = useState(false);
-  const [selectedImages, setSelectedImages] = useState<File[]>([]);
-  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
-  const [formData, setFormData] = useState({
-    registrationNumber: "",
-    perHourCharge: "",
-    fuelType: "",
-  });
-  const [originalData, setOriginalData] = useState<any>(null);
-  const [currentVehicleId, setCurrentVehicleId] = useState<string | null>(null);
+
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showAddCarModal, setShowAddCarModal] = useState(false);
+  const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
 
   useEffect(() => {
     dispatch(getVehicles());
+    dispatch(getBrands());
+    dispatch(getModels());
   }, [dispatch]);
 
   const openModalWithData = (vehicle: any) => {
-    setFormData({
-      registrationNumber: vehicle.registrationNumber,
-      perHourCharge: vehicle.perHourCharge.toString(),
-      fuelType: vehicle.fuelType,
-    });
-    setOriginalData(vehicle);
-    setCurrentVehicleId(vehicle.id);
-    setShowModal(true);
+    setSelectedVehicle(vehicle);
+    setShowEditModal(true);
   };
 
-  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  const closeAddModal=()=>{
+    setShowAddCarModal(false)
+  }
 
-  const hasChanges = () => {
-    return (
-      JSON.stringify(formData) !==
-        JSON.stringify({
-          registrationNumber: originalData?.registrationNumber,
-          perHourCharge: originalData?.perHourCharge.toString(),
-          fuelType: originalData?.fuelType,
-        }) || selectedImages.length
-    );
-  };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!hasChanges() || !currentVehicleId) return;
-
-    const updatedFormData = new FormData();
-    updatedFormData.append("registrationNumber", formData.registrationNumber);
-    updatedFormData.append("perHourCharge", formData.perHourCharge);
-    updatedFormData.append("fuelType", formData.fuelType);
-    selectedImages.forEach((image) => {
-      updatedFormData.append("vehicleImg", image);
-    });
-
-    dispatch(
-      updateCar({ id: currentVehicleId, updatedCarData: updatedFormData })
-    ).then(() => {
-      dispatch(getVehicles()); // Fetch updated vehicles after edit
-    });
-
-    setShowModal(false);
-  };
-
-  const deleteCarData = (id: string) => {
-    dispatch(deleteCar({ id: id }));
-  };
+  console.log(vehicles);
 
   return (
     <div>
+      <div className="flex justify-end mb-10">
+        <button
+          onClick={() => setShowAddCarModal(true)}
+          className="block rounded bg-secondary px-4 py-3 text-sm font-medium text-neutral transition hover:scale-105"
+        >
+          Add Car
+        </button>
+      </div>
+
+      {showAddCarModal && (
+        <Modal onClose={() => setShowAddCarModal(false)} isOpen={showAddCarModal}>
+          <AddCar onClose={closeAddModal} vehicleDataLoading={vehicleDataLoading}/>
+        </Modal>
+      )}
+
       {vehicleDataLoading && <CarSkeleton />}
 
       {vehicleDataError && (
@@ -96,120 +69,28 @@ const MyCars = () => {
       {!vehicleDataLoading &&
         !vehicleDataError &&
         vehicles &&
-        vehicles.map((el) => (
-          <div className="group relative block overflow-hidden" key={el.id}>
-            <img
-              src={el.vehicleImg[0]}
-              alt={el.registrationNumber}
-              className="h-64 w-full object-cover transition duration-500 group-hover:scale-105 sm:h-72"
-            />
-            <div className="relative border border-primary bg-white p-6">
-              <p className="text-primary">{`Per Hour Charge ₹${el.perHourCharge}`}</p>
-              <h3 className="mt-1.5 text-lg font-medium text-primary">
-                {el.registrationNumber}
-              </h3>
-              <p className="mt-1.5 line-clamp-3 text-primary">
-                {el.model.description}
-              </p>
-              <form className="mt-4 flex gap-4">
-                <button
-                  onClick={() => deleteCarData(el.id)}
-                  className="block w-full rounded bg-secondary px-4 py-3 text-sm font-medium text-neutral transition hover:scale-105"
-                >
-                  Delete Car
-                </button>
-                <button
-                  type="button"
-                  className="block w-full rounded bg-primary px-4 py-3 text-sm font-medium text-neutral transition hover:scale-105"
-                  onClick={() => openModalWithData(el)}
-                >
-                  Edit Car
-                </button>
-              </form>
-            </div>
-          </div>
+        vehicles?.data?.map((el) => (
+          <MyCarCard
+            key={el.id}
+            registrationNumber={el.registrationNumber}
+            fuelType={el.fuelType}
+            modelDetails={el.model}
+            adminDetails={el.admin}
+            perHourCharge={el.perHourCharge}
+            vehicleImage={el.vehicleImg}
+            shopDetails={el.Shop}
+            bookingStatus={el.bookedStatus}
+            openModalWithData={openModalWithData} 
+          />
         ))}
 
-      {showModal && (
-        <Modal onClose={() => setShowModal(false)} isOpen={showModal}>
-          <form onSubmit={handleSubmit}>
-            <div className="grid max-w-2xl mt-1">
-              <div className="items-center mt-8 sm:mt-14 text-black">
-                <div className="m-2">
-                  <label
-                    htmlFor="registrationNumber"
-                    className="block mb-2 text-sm font-medium"
-                  >
-                    Registration Number
-                  </label>
-                  <input
-                    name="registrationNumber"
-                    value={formData.registrationNumber}
-                    onChange={handleFormChange}
-                    type="text"
-                    className="bg-[#fff] border border-secondary text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5"
-                    placeholder="WB 12***"
-                  />
-                </div>
-
-                <div className="m-2">
-                  <label
-                    htmlFor="perHourCharge"
-                    className="block mb-2 text-sm font-medium"
-                  >
-                    Per Hour Charge
-                  </label>
-
-                  <input
-                    name="perHourCharge"
-                    value={formData.perHourCharge}
-                    onChange={handleFormChange}
-                    type="number"
-                    className="bg-[#fff] border border-secondary text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5"
-                    placeholder="200"
-                  />
-                </div>
-
-                <div className="m-2 mb-5">
-                  <label
-                    htmlFor="fuelType"
-                    className="block mb-2 text-sm font-medium"
-                  >
-                    Fuel Type
-                  </label>
-                  <input
-                    name="fuelType"
-                    value={formData.fuelType}
-                    onChange={handleFormChange}
-                    type="text"
-                    className="bg-[#fff] border border-secondary text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5"
-                    placeholder="PETROL"
-                    autoCapitalize="on"
-                  />
-                </div>
-
-                {/* Image Upload */}
-                <ImageUpload
-                  setSelectedImages={setSelectedImages}
-                  imagePreviews={imagePreviews}
-                  setImagePreviews={setImagePreviews}
-                />
-
-                <div className="flex justify-end mt-4">
-                  <button
-                    type="submit"
-                    className={`w-full flex justify-center bg-gradient-to-r from-primary to-secondary text-neutral p-4 rounded-full tracking-wide font-semibold shadow-lg transition-all duration-300 ease-in-out hover:scale-105 ${
-                      !hasChanges() ? "opacity-50 cursor-not-allowed" : ""
-                    }`}
-                    disabled={!hasChanges()}
-                  >
-                    Save Changes
-                  </button>
-                </div>
-              </div>
-            </div>
-          </form>
-        </Modal>
+      {showEditModal && selectedVehicle && (
+        <EditCar
+          isOpen={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          vehicle={selectedVehicle}
+          vehicleDataLoading={vehicleDataLoading}
+        />
       )}
     </div>
   );

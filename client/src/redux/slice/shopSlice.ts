@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { getLocalStorage } from "../../utils/LocalStorage";
+import { getLocalStorage, setLocalStorage } from "../../utils/LocalStorage";
 import axiosInstance from "../../utils/axiosInstance";
 
 interface Shop {

@@ -20,11 +20,11 @@ const Profile = () => {
   const loading = useSelector(userLoading);
   const error = useSelector(userError);
 
-  const [initialValues, setInitialValues] = useState(profile);
+  const [initialValues, setInitialValues] = useState<any>(profile);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [avatarDeleted, setAvatarDeleted] = useState(false);
-  const [hasChanges, setHasChanges] = useState(false); 
+  const [hasChanges, setHasChanges] = useState(false);
 
   useEffect(() => {
     if (selectedFile) {
@@ -58,44 +58,36 @@ const Profile = () => {
     }
   };
 
-  const handleDelete = () => {
-    setAvatarDeleted(true);
-    setSelectedFile(null);
-  };
-
   const checkChanges = (values: any) => {
     const isDifferent =
       JSON.stringify(values) !== JSON.stringify(initialValues) ||
       selectedFile ||
       avatarDeleted;
-    setHasChanges(isDifferent);
+    setHasChanges(isDifferent ? true : false);
   };
-
-
-  console.log(selectedFile);
 
   const handleSubmit = (values: any) => {
     const changedValues: any = {};
-  
+
     for (const key in values) {
       if (values[key] !== initialValues[key]) {
         changedValues[key] = values[key];
       }
     }
-  
+
     if (avatarDeleted) {
       changedValues.avatar = "";
     }
-  
+
     if (selectedFile) {
-      const formData = new FormData();
-  
+      const formData: any = new FormData();
+
       for (const key in changedValues) {
         formData.append(key, changedValues[key]);
       }
-  
+
       formData.append("avatar", selectedFile);
-  
+
       dispatch(updateProfile(formData)).then(() => {
         dispatch(getProfile());
       });
@@ -122,7 +114,7 @@ const Profile = () => {
           {error && <p className="text-red-500">{error}</p>}
           {profile && (
             <Formik
-              initialValues={initialValues} 
+              initialValues={initialValues}
               enableReinitialize
               validationSchema={profileValidationSchema}
               onSubmit={handleSubmit}
@@ -159,15 +151,6 @@ const Profile = () => {
                           >
                             Change picture
                           </button>
-                          {profile?.avatar && (
-                            <button
-                              type="button"
-                              className="py-3.5 px-7 text-base font-medium text-neutral bg-primary rounded-lg border border-secondary hover:bg-primary"
-                              onClick={handleDelete}
-                            >
-                              Delete picture
-                            </button>
-                          )}
                         </div>
                       </div>
 
@@ -189,7 +172,7 @@ const Profile = () => {
                           <ErrorMessage
                             name="name"
                             component="div"
-                            className="text-red-500 text-sm"
+                            className="text-secondary text-sm"
                           />
                         </div>
 
@@ -210,7 +193,7 @@ const Profile = () => {
                           <ErrorMessage
                             name="email"
                             component="div"
-                            className="text-red-500 text-sm"
+                            className="text-secondary text-sm"
                           />
                         </div>
 
@@ -231,7 +214,7 @@ const Profile = () => {
                           <ErrorMessage
                             name="phone"
                             component="div"
-                            className="text-red-500 text-sm"
+                            className="text-secondary text-sm"
                           />
                         </div>
 
@@ -252,7 +235,7 @@ const Profile = () => {
                           <ErrorMessage
                             name="address"
                             component="div"
-                            className="text-red-500 text-sm"
+                            className="text-secondary text-sm"
                           />
                         </div>
 

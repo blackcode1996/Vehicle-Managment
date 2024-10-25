@@ -39,7 +39,7 @@ const Login = () => {
     if (!isLoading && !isError && usersData) {
       const role = usersData?.role;
       if (role === "CUSTOMER") {
-        navigate("/vehilcles");
+        navigate("/vehicles");
       } else if (role === "ADMIN") {
         navigate("/seller");
       }

@@ -35,15 +35,27 @@ export const LoginValidationRules = Yup.object().shape({
 
 export const profileValidationSchema = Yup.object().shape({
     name: Yup.string()
-        .min(3, 'Name must be at least 3 characters long')
-        .required('Name is required'),
+        .nullable()
+        .test(
+            'is-valid-name',
+            'Name must be at least 3 characters long',
+            value => !value || value.length >= 3
+        ),
     email: Yup.string()
-        .email('Please enter a valid email')
-        .required('Email is required'),
+        .nullable()
+        .test(
+            'is-valid-email',
+            'Please enter a valid email',
+            value => !value || Yup.string().email().isValidSync(value)
+        ),
     phone: Yup.string()
-        .matches(/^[6-9]\d{9}$/, 'Phone number must be a valid 10-digit number')
-        .required('Phone number is required'),
-})
+        .nullable()
+        .test(
+            'is-valid-phone',
+            'Phone number must be a valid 10-digit number',
+            value => !value || /^[6-9]\d{9}$/.test(value)
+        ),
+});
 
 export const shopValidationSchema = Yup.object().shape({
     name: Yup.string()

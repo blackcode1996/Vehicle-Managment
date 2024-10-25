@@ -38,7 +38,7 @@ const Registration = () => {
                   : "Start your journey"}
               </h2>
               <p className="mt-2 text-sm text-secondary">
-                Please sign in to your account
+                Please sign up to your account
               </p>
             </div>
             <RegistrationForm resgisterAsSeller={resgisterAsSeller} />

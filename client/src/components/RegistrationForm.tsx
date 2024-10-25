@@ -160,12 +160,12 @@ const RegistrationForm = ({
         </button>
       </div>
       <p className="flex flex-col items-center justify-center mt-10 text-center text-md text-gray-500">
-        <span>Don't have an account?</span>
+        <span>Alraedy registered?</span>
         <Link
           to="/login"
           className="text-indigo-400 hover:text-blue-500 no-underline hover:underline cursor-pointer transition ease-in duration-300"
         >
-          Sign up
+          Sign In
         </Link>
       </p>
     </form>
