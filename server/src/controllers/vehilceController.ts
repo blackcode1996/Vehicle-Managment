@@ -25,12 +25,11 @@ export const createVehicle = async (req: Request, res: Response) => {
             vehicleImg: vehicleImg?.map((img) => img.secure_url),
         });
 
-        return res.status(201).json({ message: "Vehicle created successfully.", vehicle });
+        return res.status(200).json({ message: "Vehicle created successfully.", vehicle });
     } catch (error: any) {
         return res.status(400).json({ error: error.message });
     }
 };
-
 
 export const getAllVehicles = async (req: Request, res: Response) => {
   try {
@@ -42,6 +41,9 @@ export const getAllVehicles = async (req: Request, res: Response) => {
       sortOrder = 'asc', 
       brand, 
       model, 
+      fuelType,
+      bookedFrom,
+      bookedTo,
     } = req.query;
 
     const { user } = req;
@@ -55,6 +57,9 @@ export const getAllVehicles = async (req: Request, res: Response) => {
       adminId = user.userId;
     }
 
+    const parsedBookedFrom = bookedFrom ? new Date(bookedFrom as string) : undefined;
+    const parsedBookedTo = bookedTo ? new Date(bookedTo as string) : undefined;
+
     const vehicles = await vehicleService.getAllVehiclesService({
       page: parsedPage,
       limit: parsedLimit,
@@ -64,6 +69,9 @@ export const getAllVehicles = async (req: Request, res: Response) => {
       adminId,
       brand: brand as string,
       model: model as string,
+      fuelType: fuelType as string,
+      bookedFrom: parsedBookedFrom,
+      bookedTo: parsedBookedTo,
     });
 
     return res.status(200).json({ message: "Vehicles received successfully", vehicles });
@@ -71,10 +79,6 @@ export const getAllVehicles = async (req: Request, res: Response) => {
     return res.status(500).json({ error: error.message });
   }
 };
-
-
-
-
 
 export const getVehicleById = async (req: Request, res: Response) => {
     const { id } = req.params;

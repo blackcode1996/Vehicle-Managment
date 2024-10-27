@@ -25,6 +25,8 @@ interface VehicleData {
   };
 }
 
+
+
 interface VehicleState {
   vehicleData: VehicleData[] | null;
   loading: boolean;
@@ -45,16 +47,16 @@ interface RootState {
 
 export const getVehicles = createAsyncThunk(
   'vehicle/getVehicles',
-  async ({ page = 1, limit = 4, search = '', sortField = 'perHourCharge', sortOrder = 'desc', brand = '', model = '' }: { page?: number; limit?: number; search?: string; sortField?: string; sortOrder?: string; brand?: string; model?: string }, { rejectWithValue }) => {
+  async ({ page = 1, limit = 4, search = '', sortField = 'perHourCharge', sortOrder = 'desc', brand = '', model = '', fuelType = '' }: { page?: number; limit?: number; search?: string; sortField?: string; sortOrder?: string; brand?: string; model?: string, fuelType?: string }, { rejectWithValue }) => {
     try {
       const token = getLocalStorage('userToken') || '';
       const response = await axiosInstance.get('/api/vehicles', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-        params: { page, limit, search, sortField, sortOrder, brand, model },
+        params: { page, limit, search, sortField, sortOrder, brand, model, fuelType },
       });
-      return response.data; 
+      return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response.data);
     }
@@ -128,7 +130,7 @@ const vehicleSlice = createSlice({
         state.success = false;
       })
       .addCase(getVehicles.fulfilled, (state, action: PayloadAction<{ data: VehicleData[] }>) => {
-        state.vehicleData = action.payload.vehicles;
+        state.vehicleData = action.payload;
         state.loading = false;
         state.success = true;
       })

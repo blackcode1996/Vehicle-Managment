@@ -1,5 +1,5 @@
 import { useState } from "react";
-import MyBookings from "../components/ReservationCard";
+import MyBookings from "../components/MyBookings";
 import ProfilSection from "../components/ProfileSection";
 import ResetPassword from "../components/ResetPassword";
 import { useSelector } from "react-redux";

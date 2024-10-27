@@ -7,30 +7,9 @@ import { addCar, getVehicles } from "../redux/slice/carsSlice";
 import { useAppDispatch } from "../hooks/useAppDispatch";
 import ImageUpload from "./ImageUpload";
 import { getShop, shopData } from "../redux/slice/shopSlice";
+import { fuelTypeOptions } from "../utils/fuelType";
 
-// Define the FuelType enum
-enum FuelType {
-  PETROL = "PETROL",
-  DIESEL = "DIESEL",
-  ELECTRIC = "ELECTRIC",
-  HYBRID = "HYBRID",
-}
-
-// Define dummy images for each fuel type
-const fuelTypeImages = {
-  [FuelType.PETROL]: "https://via.placeholder.com/100?text=Petrol",
-  [FuelType.DIESEL]: "https://via.placeholder.com/100?text=Diesel",
-  [FuelType.ELECTRIC]: "https://via.placeholder.com/100?text=Electric",
-  [FuelType.HYBRID]: "https://via.placeholder.com/100?text=Hybrid",
-};
-
-const fuelTypeOptions = Object.values(FuelType).map((fuel) => ({
-  id: fuel,
-  name: fuel,
-  image: fuelTypeImages[fuel],
-}));
-
-const AddCar = ({ onClose,vehicleDataLoading }: any) => {
+const AddCar = ({ onClose, vehicleDataLoading }: any) => {
   const dispatch = useAppDispatch();
   const brands: any = useSelector(brandData);
   const models: any = useSelector(modelData);
@@ -48,7 +27,6 @@ const AddCar = ({ onClose,vehicleDataLoading }: any) => {
     dispatch(getShop());
   }, [dispatch]);
 
-  console.log(shop[0]?.id);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -151,7 +129,7 @@ const AddCar = ({ onClose,vehicleDataLoading }: any) => {
           type="submit"
           className="rounded bg-primary px-4 py-3 text-sm font-medium text-neutral transition hover:scale-105"
         >
-         {vehicleDataLoading ? "Adding..." :"Add Car"}
+          {vehicleDataLoading ? "Adding..." : "Add Car"}
         </button>
       </div>
     </form>

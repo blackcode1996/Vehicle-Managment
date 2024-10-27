@@ -12,17 +12,17 @@ const Modal: React.FC<ModalType> = ({ isOpen, onClose, children }) => {
   return (
     <div
       onClick={onClose}
-      className="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-50 backdrop-blur-sm"
+      className="fixed inset-0 z-40 flex justify-center items-center bg-primary bg-opacity-50 backdrop-blur-sm overflow-auto"
     >
       <div
         onClick={(e) => {
           e.stopPropagation();
         }}
-        className="relative max-w-xl w-full bg-white rounded-lg shadow-lg overflow-hidden transform transition-all duration-300 ease-out scale-100 hover:scale-105 p-6"
+        className="relative my-8 mx-auto max-w-xl w-full bg-white rounded-lg shadow-lg transform transition-all duration-300 ease-out scale-100 hover:scale-105 p-6 z-50"
       >
         <button
           onClick={onClose}
-          className="absolute text-2xl top-[5px] right-[5px] bg-secondary text-neutral rounded-full w-8 h-8 flex items-center justify-center"
+          className="absolute top-2 right-2 bg-secondary text-neutral rounded-full w-8 h-8 flex items-center justify-center text-sm"
         >
           ✕
         </button>

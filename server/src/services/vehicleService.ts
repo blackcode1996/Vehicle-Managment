@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient } from '@prisma/client';
+import { FuelType, Prisma, PrismaClient } from '@prisma/client';
 import prisma from '../models/index';
 
 
@@ -59,6 +59,9 @@ export const getAllVehiclesService = async ({
   adminId = null,
   brand,
   model,
+  fuelType,
+  bookedFrom,
+  bookedTo,
 }: {
   page: number;
   limit: number;
@@ -68,6 +71,9 @@ export const getAllVehiclesService = async ({
   adminId?: string | null;
   brand?: string;
   model?: string;
+  fuelType?: string;
+  bookedFrom?: Date;
+  bookedTo?: Date;
 }) => {
   const skip = (page - 1) * limit;
 
@@ -76,6 +82,9 @@ export const getAllVehiclesService = async ({
   const where: Prisma.VehicleWhereInput = {
     ...(adminId && {
       adminId,
+    }),
+    ...(fuelType && {
+      fuelType: { equals: fuelType as FuelType }, 
     }),
     ...(search && {
       OR: [
@@ -100,7 +109,7 @@ export const getAllVehiclesService = async ({
     ...(brand && {
       model: {
         brand: {
-          name: { contains: brand, mode: Prisma.QueryMode.insensitive }, 
+          name: { contains: brand, mode: Prisma.QueryMode.insensitive },
         },
       },
     }),
@@ -109,6 +118,12 @@ export const getAllVehiclesService = async ({
         name: { contains: model, mode: Prisma.QueryMode.insensitive },
       },
     }),
+    bookings: bookedFrom || bookedTo ? {
+      some: {
+        ...(bookedFrom && { bookedFrom: { gte: bookedFrom } }),
+        ...(bookedTo && { bookedTo: { lte: bookedTo } }),
+      },
+    } : undefined,
   };
 
   const vehicles = await prisma.vehicle.findMany({

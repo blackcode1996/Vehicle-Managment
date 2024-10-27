@@ -6,6 +6,7 @@ import vehicleSlice from "./slice/carsSlice";
 import brandReducer from "./slice/brandSlice";
 import modelReducer from './slice/modelSlice';
 import filterReducer from './slice/filterSortSlice';
+import bookingReducer from './slice/bookingSlice';
 
 
 const store = configureStore({
@@ -16,7 +17,8 @@ const store = configureStore({
         vehicle: vehicleSlice,
         brand: brandReducer,
         model: modelReducer,
-        filter: filterReducer
+        filter: filterReducer,
+        booking: bookingReducer
     },
 });
 

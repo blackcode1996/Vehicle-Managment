@@ -111,6 +111,6 @@ model Booking {
   userId              String        @db.Uuid
   cancellationCharges Float?
   cancellationDate    DateTime?
-  shop                Shop?         @relation(fields: [shopId], references: [id]) // Relation to Shop
+  shop                Shop?         @relation(fields: [shopId], references: [id]) 
   shopId              String?       @db.Uuid
 }

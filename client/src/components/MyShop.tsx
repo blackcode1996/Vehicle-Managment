@@ -20,8 +20,6 @@ const MyShop = () => {
   const error = useSelector(shopError);
   const [isChanged, setIsChanged] = useState(false);
 
-  console.log("shop in my shop",shop);
-
   useEffect(() => {
     dispatch(getShop());
   }, [dispatch]);

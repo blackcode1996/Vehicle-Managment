@@ -9,6 +9,8 @@ import Vehicles from "../pages/Vehicles";
 import PrivateRoutes from "../hoc/privateRoutes";
 import Profile from "../pages/Profile";
 import PageNotFound from "../components/PageNotFound";
+import AboutSection from "../pages/About";
+import ContactUs from "../pages/ContactUs";
 
 const router = createBrowserRouter([
   {
@@ -47,6 +49,14 @@ const router = createBrowserRouter([
       {
         path:"/profile",
         element: <Profile/>
+      },
+      {
+        path:"/about",
+        element: <AboutSection/>
+      },
+      {
+        path:"/contact",
+        element: <ContactUs/>
       },
       {
         path:"*",

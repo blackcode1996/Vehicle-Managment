@@ -3,7 +3,7 @@ import { FaUser, FaBars, FaTimes } from "react-icons/fa";
 import logo from "../assets/logo.png";
 import car from "../assets/car.gif";
 import carProfile from "../assets/carProfile.png";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
   clearLocalStorage,
   getLocalStorage,
@@ -13,7 +13,7 @@ import {
 const navLinks = [
   { title: "Home", url: "/" },
   { title: "About", url: "/about" },
-  { title: "Services", url: "/services" },
+  { title: "Cars", url: "/vehicles" },
   { title: "Contact", url: "/contact" },
 ];
 
@@ -25,6 +25,11 @@ const Header = () => {
   const [userData, setUserData] = useState({});
   const user = getLocalStorage("user");
   const navigate = useNavigate();
+
+  const location = useLocation();
+
+  console.log(location);
+
 
   useEffect(() => {
     setUserData(user);
@@ -72,7 +77,9 @@ const Header = () => {
                 <Link
                   key={index}
                   to={link.url}
-                  className="relative text-lg after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-[5px] after:bg-secondary after:transition-all after:duration-300 hover:after:w-full"
+                  className={`relative text-lg after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-[5px] after:bg-secondary after:transition-all after:duration-300 hover:after:w-full ${
+                    location.pathname === link.url ? "after:bg-primary after:w-full" : ""
+                  }`}
                 >
                   {link.title}
                 </Link>

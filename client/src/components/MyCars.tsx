@@ -26,7 +26,7 @@ const MyCars = () => {
   const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
 
   useEffect(() => {
-    dispatch(getVehicles());
+    dispatch(getVehicles({}));
     dispatch(getBrands());
     dispatch(getModels());
   }, [dispatch]);

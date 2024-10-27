@@ -7,21 +7,33 @@ import {
   vehicleError,
   vehicleLoading,
 } from "../redux/slice/carsSlice";
-import { getModels, modelData, modelError, modelLoading } from "../redux/slice/modelSlice";
-import { brandData, brandError, brandLoading, getBrands } from "../redux/slice/brandSlice";
+import {
+  getModels,
+  modelData,
+  modelError,
+  modelLoading,
+} from "../redux/slice/modelSlice";
+import {
+  brandData,
+  brandError,
+  brandLoading,
+  getBrands,
+} from "../redux/slice/brandSlice";
 import MyCarCard from "../components/VehicleCard";
 import Pagination from "../components/Pagination";
-import DatePicker from "../components/DatePicker";
 import Dropdown from "../components/CustomDropdown";
-import PriceRangeSlider from "../components/Slider";
+import DatePicker from "../components/DatePicker";
+import { fuelTypeOptions } from "../utils/fuelType";
+import { sortOptions } from "../utils/sortType";
+import VehiclePageSkeleton from "../components/Skeletons/vehiclePageSkeleton";
+import Modal from "../components/Modal";
+import BookCarModal from "../components/BookCarModal";
 
 const Vehicles = () => {
   const dispatch = useAppDispatch();
-
-  const vehicles: any = useSelector(vehicleData);
+  const vehicles = useSelector<any>(vehicleData);
   const vehicleDataLoading = useSelector(vehicleLoading);
   const vehicleDataError = useSelector(vehicleError);
-
 
   const brands = useSelector(brandData);
   const brandsDataLoading = useSelector(brandLoading);
@@ -31,97 +43,201 @@ const Vehicles = () => {
   const modelsDataLoading = useSelector(modelLoading);
   const modelDataError = useSelector(modelError);
 
-  const [selectedBrand, setSelectedBrand] = useState(null);
-  const [selectedModel, setSelectedModel] = useState(null);
+  const [selectedBrand, setSelectedBrand] = useState<any>(null);
+  const [selectedModel, setSelectedModel] = useState<any>(null);
+  const [selectedFuelType, setSelectedFuelType] = useState<any>(null);
+  const [selectedSortOption, setSelectedSortOption] = useState<any>(null);
+  const [openBookModal, setOpenBookModal] = useState<any>(false);
+  const [selectedVehicle, setSelectedVehicle] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
 
-  console.log(selectedBrand);
-  console.log(selectedModel);
-
-useEffect(() => {
-    dispatch(getVehicles({}));
+  useEffect(() => {
     dispatch(getBrands());
     dispatch(getModels());
+    handleResetFilters();
   }, [dispatch]);
 
-  const handleBrandSelect = (brand: any) => setSelectedBrand(brand);
-  const handleModelSelect = (model: any) => setSelectedModel(model);
+  const handleApplyFilters = () => {
+    dispatch(
+      getVehicles({
+        page: currentPage,
+        limit: itemsPerPage,
+        brand: selectedBrand?.name || "",
+        model: selectedModel?.name || "",
+        fuelType: selectedFuelType?.name || "",
+        sortField: selectedSortOption?.field,
+        sortOrder: selectedSortOption?.order,
+      })
+    );
+  };
 
-  if (vehicleDataLoading) return <p>Loading vehicles...</p>;
+  const handleResetFilters = () => {
+    setSelectedBrand(null);
+    setSelectedModel(null);
+    setSelectedFuelType(null);
+    setSelectedSortOption(null);
+    setCurrentPage(1);
+    dispatch(
+      getVehicles({
+        page: 1,
+        limit: itemsPerPage,
+        brand: "",
+        model: "",
+        fuelType: "",
+        sortField: "perHourCharge",
+        sortOrder: "asc",
+      })
+    );
+  };
+
+  const handlePagination = (page: number) => {
+    setCurrentPage(page);
+    dispatch(
+      getVehicles({
+        page,
+        limit: itemsPerPage,
+        brand: selectedBrand?.name || "",
+        model: selectedModel?.name || "",
+        fuelType: selectedFuelType?.name || "",
+        sortField: selectedSortOption?.field,
+        sortOrder: selectedSortOption?.order,
+      })
+    );
+  };
+
+  const handleSort = (sortOption: any) => {
+    setSelectedSortOption(sortOption);
+    dispatch(
+      getVehicles({
+        page: currentPage,
+        limit: itemsPerPage,
+        brand: selectedBrand?.name || "",
+        model: selectedModel?.name || "",
+        fuelType: selectedFuelType?.name || "",
+        sortField: sortOption?.field || "perHourCharge",
+        sortOrder: sortOption?.order || "asc",
+      })
+    );
+  };
+
+  const openModalWithData = (data: any) => {
+    console.log(data);
+    setSelectedVehicle(data);
+    setOpenBookModal(true);
+
+  };
+
+
+  if (vehicleDataLoading) return <VehiclePageSkeleton />;
   if (vehicleDataError)
     return <p>Error fetching vehicles: {vehicleDataError}</p>;
 
   return (
-    <div className="p-4">
-      <div className="flex flex-col md:flex-row mt-4">
-        {/* Filter Section (aside) */}
-        <aside className="w-full md:w-1/4 p-4">
-          <div className="sticky top-12 flex flex-col gap-2 p-4 text-sm border-r border-secondary">
-            <h2 className="text-lg font-bold mb-4">Filters</h2>
-
-            {/* Brand Dropdown */}
+    <div className="p-4 min-h-screen">
+      <div className="flex flex-col md:flex-row gap-2">
+        <aside className="text-primary bg-neutral w-full p-4 rounded-lg border-b-4 border-r-4 border-secondary sticky top-4 self-start shadow-lg h-full">
+          <div className="flex flex-col gap-6 text-sm">
+            <h2 className="text-lg font-bold">Filters</h2>
             <Dropdown
               label="Brand"
               items={brands}
               selectedItem={selectedBrand}
-              onSelect={handleBrandSelect}
+              onSelect={setSelectedBrand}
               loading={brandsDataLoading}
               error={brandsDataError}
               itemImageKey="logo"
             />
-
-            {/* Model Dropdown */}
             <Dropdown
               label="Model"
               items={models}
               selectedItem={selectedModel}
-              onSelect={handleModelSelect}
+              onSelect={setSelectedModel}
               loading={modelsDataLoading}
               error={modelDataError}
               itemImageKey="modelImg"
             />
-
-            {/* Date Pickers */}
-            <div className="flex gap-4 w-full justify-between mt-4">
-              <div>
-                <h3 className="font-semibold">From</h3>
+            <Dropdown
+              label="Fuel Type"
+              items={fuelTypeOptions}
+              selectedItem={selectedFuelType}
+              onSelect={setSelectedFuelType}
+              loading={false}
+              error={false}
+              itemImageKey="image"
+            />
+            <div className="flex gap-2 w-full justify-between items-center mt-1">
+              <div className="w-full">
+                <h3 className="font-semibold mb-1">From</h3>
                 <DatePicker />
               </div>
-              <div>
-                <h3 className="font-semibold">To</h3>
+              <div className="w-full">
+                <h3 className="font-semibold mb-1">To</h3>
                 <DatePicker />
               </div>
             </div>
-
-            {/* Price Range */}
-            <PriceRangeSlider/>
+            <button
+              onClick={handleApplyFilters}
+              className="rounded bg-secondary text-white px-4 py-2 text-sm font-medium transition hover:bg-primary w-full"
+            >
+              Apply Filters
+            </button>
+            <button
+              onClick={handleResetFilters}
+              className="rounded bg-neutral text-primary border border-secondary px-4 py-2 text-sm font-medium transition w-full"
+            >
+              Reset Filters
+            </button>
           </div>
         </aside>
-
-        {/* Main Content Section */}
-        <main className="flex-grow p-4">
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-3 place-items-center">
-            {vehicles?.data?.map((vehicle: any) => (
-              <MyCarCard
-                key={vehicle.id}
-                registrationNumber={vehicle.registrationNumber}
-                fuelType={vehicle.fuelType}
-                modelDetails={vehicle.model}
-                adminDetails={vehicle.admin}
-                perHourCharge={vehicle.perHourCharge}
-                vehicleImage={vehicle.vehicleImg}
-                shopDetails={vehicle.Shop}
-                bookingStatus={vehicle.bookedStatus}
-                deleteEditButton={false}
+        <main className="flex-grow p-4 bg-gray-50 rounded-lg shadow-md">
+          <div className="flex justify-end mb-2">
+            <div className="w-max">
+              <Dropdown
+                label="Sort By"
+                items={sortOptions}
+                selectedItem={selectedSortOption}
+                onSelect={handleSort}
+                loading={false}
+                error={false}
+                itemImageKey="label"
               />
-            ))}
+            </div>
           </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {vehicles &&
+              vehicles?.vehicles.data?.map((vehicle: any) => (
+                <MyCarCard
+                  key={vehicle.id}
+                  vehicleId = {vehicle.id}
+                  registrationNumber={vehicle.registrationNumber}
+                  fuelType={vehicle.fuelType}
+                  modelDetails={vehicle.model}
+                  adminDetails={vehicle.admin}
+                  perHourCharge={vehicle.perHourCharge}
+                  vehicleImage={vehicle.vehicleImg}
+                  shopDetails={vehicle.Shop}
+                  bookingStatus={vehicle.bookedStatus}
+                  deleteEditButton={false}
+                  openModalWithData={openModalWithData}
+                />
+              ))}
+          </div>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={vehicles?.vehicles.totalPages}
+            onPageChange={handlePagination}
+          />
         </main>
       </div>
-
-      <Pagination
-        currentPage={vehicles?.currentPage}
-        totalPages={vehicles?.totalPages}
-      />
+      {openBookModal && (
+        <Modal isOpen={openBookModal} onClose={() => setOpenBookModal(false)}>
+          <BookCarModal
+            vehicle={selectedVehicle}
+          />
+        </Modal>
+      )}
     </div>
   );
 };

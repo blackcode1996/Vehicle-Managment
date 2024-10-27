@@ -3,15 +3,6 @@ import { toast } from 'react-toastify';
 
 const axiosInstance = axios.create();
 
-// axiosInstance.interceptors.request.use(
-//   (config) => {
-//     toast.info('Loading...');
-//     return config;
-//   },
-//   (error) => {
-//     return Promise.reject(error);
-//   }
-// );
 
 axiosInstance.interceptors.response.use(
   (response) => {
@@ -20,7 +11,7 @@ axiosInstance.interceptors.response.use(
   },
   (error) => {
     if (error.response) {
-      toast.error(error.response.data.error);
+      toast.error(error.response.data.error || error.response);
     } else {
       toast.error('An error occurred. Please try again.');
     }

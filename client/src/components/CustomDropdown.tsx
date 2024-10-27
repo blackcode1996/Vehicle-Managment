@@ -40,6 +40,7 @@ const Dropdown: React.FC<DropdownProps> = ({
   if(loading) return <div>Loading...</div>
   if(error) return <div>{error}</div>
 
+
   return (
     <div className="m-2">
       <label className="block mb-2 text-sm font-bold">
