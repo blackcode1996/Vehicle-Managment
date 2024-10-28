@@ -18,8 +18,16 @@ export default {
     },
     extend: {
       backgroundImage: {
-        "three-color-gradient":
-          "linear-gradient(to bottom, var(--tw-gradient-stops))",
+        "three-color-gradient": "linear-gradient(to bottom, var(--tw-gradient-stops))",
+      },
+      keyframes: {
+        cycle: {
+          "0%": { left: "10%" },
+          "100%": { left: "90%" },
+        },
+      },
+      animation: {
+        cycle: "cycle 15s linear infinite",
       },
       dropShadow: {
         glow: '0 0 15px rgba(171, 17, 17, 0.6)',  

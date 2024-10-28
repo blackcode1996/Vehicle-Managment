@@ -69,7 +69,7 @@ const MyCars = () => {
       {!vehicleDataLoading &&
         !vehicleDataError &&
         vehicles &&
-        vehicles?.data?.map((el) => (
+        vehicles?.vehicles?.data?.map((el) => (
           <MyCarCard
             key={el.id}
             registrationNumber={el.registrationNumber}

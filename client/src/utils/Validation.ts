@@ -2,8 +2,10 @@ import * as Yup from 'yup';
 
 export const RegistrationValidationSchema = Yup.object().shape({
     name: Yup.string()
-        .min(3, 'Name must be at least 3 characters long')
-        .required('Name is required'),
+        .nullable()
+        .min(3, "Too Short!")
+        .max(40, "Too Long!")
+        .matches(/^[A-Za-z ]*$/, 'Please enter valid name'),
     email: Yup.string()
         .email('Please enter a valid email')
         .required('Email is required'),
@@ -36,11 +38,9 @@ export const LoginValidationRules = Yup.object().shape({
 export const profileValidationSchema = Yup.object().shape({
     name: Yup.string()
         .nullable()
-        .test(
-            'is-valid-name',
-            'Name must be at least 3 characters long',
-            value => !value || value.length >= 3
-        ),
+        .min(3, "Too Short!")
+        .max(40, "Too Long!")
+        .matches(/^[A-Za-z ]*$/, 'Please enter valid name'),
     email: Yup.string()
         .nullable()
         .test(
@@ -59,7 +59,8 @@ export const profileValidationSchema = Yup.object().shape({
 
 export const shopValidationSchema = Yup.object().shape({
     name: Yup.string()
-        .min(3, 'Name must be at least 3 characters long')
+        .min(3, 'Too Short!')
+        .max(40, 'Too Long!')
         .required('Name is required'),
     address: Yup.string()
         .min(10, 'Address must be at least 3 characters long')

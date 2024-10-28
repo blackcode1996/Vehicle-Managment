@@ -2,7 +2,7 @@ import { MapPin, Clock, Navigation, Car } from "lucide-react";
 
 interface Booking {
   id: string;
-  status: "PENDING" | "COMPLETED" | "CANCELLED";
+  status:  "PENDING" | "ACCEPTED" | "DECLINED" | "CANCELLED";
   bookedFrom: string;
   bookedTo: string;
   bookingFromAddress: string;
@@ -58,8 +58,13 @@ const BookingCard: React.FC<BookingCardProps> = ({ bookings, onAddressClick }) =
     return address.split(",").slice(0, 2).join(",");
   };
 
-  const generateMapURL = (from: [number, number], to: [number, number]) => {
-    return `https://maps.google.com/maps?q=${from[0]},${from[1]}&t=&z=13&ie=UTF8&iwloc=&output=embed&daddr=${to[0]},${to[1]}`;
+  const generateMapURL = (coordinates: [number, number]) => {
+    return `https://maps.google.com/maps?q=&t=&z=13&ie=UTF8&iwloc=&output=embed&daddr=${coordinates[0]},${coordinates[1]}`;
+  };
+
+  const handleAddressClick = (address: string, location: [number, number]) => {
+    const mapURL = generateMapURL(location);
+    window.open(mapURL, "_blank"); 
   };
 
   return (
@@ -114,6 +119,7 @@ const BookingCard: React.FC<BookingCardProps> = ({ bookings, onAddressClick }) =
             <div className="space-y-4 mb-6">
               <div 
                 className="flex items-start gap-3 p-3 hover:bg-neutral rounded-lg cursor-pointer transition-colors"
+                onClick={() => handleAddressClick(booking.bookingFromAddress, booking.bookingFromLocation)}
               >
                 <div className="mt-1">
                   <MapPin className="w-5 h-5 text-middle" />
@@ -129,12 +135,23 @@ const BookingCard: React.FC<BookingCardProps> = ({ bookings, onAddressClick }) =
                 </div>
               </div>
 
+              <div className="relative h-48 mt-4">
+              <iframe
+                src={generateMapURL(booking.bookingFromLocation)}
+                width="100%"
+                height="100%"
+                loading="lazy"
+                className="rounded-lg shadow-md"
+              />
+            </div>
+
               <div className="flex justify-center">
                 <Navigation className="w-5 h-5 text-middle transform rotate-90" />
               </div>
               
               <div 
                 className="flex items-start gap-3 p-3 hover:bg-neutral rounded-lg cursor-pointer transition-colors"
+                onClick={() => handleAddressClick(booking.bookingToAddress, booking.bookingToLocation)}
               >
                 <div className="mt-1">
                   <MapPin className="w-5 h-5 text-secondary" />
@@ -153,7 +170,7 @@ const BookingCard: React.FC<BookingCardProps> = ({ bookings, onAddressClick }) =
 
             <div className="relative h-48 mt-4">
               <iframe
-                src={generateMapURL(booking.bookingFromLocation, booking.bookingToLocation)}
+                src={generateMapURL(booking.bookingToLocation)}
                 width="100%"
                 height="100%"
                 loading="lazy"

@@ -4,7 +4,7 @@ CREATE TYPE "UserRole" AS ENUM ('CUSTOMER', 'ADMIN', 'SUPER_ADMIN');
 -- CreateTable
 CREATE TABLE "User" (
     "id" UUID NOT NULL,
-    "name" TEXT NOT NULL,
+    "name" TEXT NOT NULL, 
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "phone" TEXT,

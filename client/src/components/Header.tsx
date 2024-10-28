@@ -3,7 +3,7 @@ import { FaUser, FaBars, FaTimes } from "react-icons/fa";
 import logo from "../assets/logo.png";
 import car from "../assets/car.gif";
 import carProfile from "../assets/carProfile.png";
-import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   clearLocalStorage,
   getLocalStorage,
@@ -27,8 +27,6 @@ const Header = () => {
   const navigate = useNavigate();
 
   const location = useLocation();
-
-  console.log(location);
 
 
   useEffect(() => {

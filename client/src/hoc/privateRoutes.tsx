@@ -6,7 +6,7 @@ const PrivateRoutes = ({ children }: { children: React.ReactNode }) => {
   let isToken = getLocalStorage("userToken");
   let user = getLocalStorage("user");
 
-  return <div>{isToken && user?.role === "ADMIN" ? children : <Vehicles />}</div>;
+  return <div>{isToken && user?.user?.role === "ADMIN" ? children : <Vehicles />}</div>;
 };
 
 export default PrivateRoutes;
