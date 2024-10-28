@@ -6,7 +6,8 @@ import Registration from "../pages/Registration";
 import VerifyEmail from "../pages/VerifyEmail";
 import Seller from "../pages/Seller";
 import Vehicles from "../pages/Vehicles";
-import PrivateRoutes from "../hoc/privateRoutes";
+import AdminPrivateRoutes from "../hoc/AdminPrivateRoutes/privateRoutes";
+import CustomerPrivateRoutes from "../hoc/CustomerPrivateRoutes/PrivateRoutes";
 import Profile from "../pages/Profile";
 import PageNotFound from "../components/PageNotFound";
 import AboutSection from "../pages/About";
@@ -37,14 +38,19 @@ const router = createBrowserRouter([
       {
         path: "/seller",
         element: (
-          <PrivateRoutes>
+          <AdminPrivateRoutes>
             <Seller />
-          </PrivateRoutes>
+          </AdminPrivateRoutes>
         ),
       },
       {
         path: "/vehicles",
-        element: <Vehicles />,
+        element: (
+          <CustomerPrivateRoutes>
+            <Vehicles />
+          </CustomerPrivateRoutes>
+        
+        ),
       },
       {
         path:"/profile",

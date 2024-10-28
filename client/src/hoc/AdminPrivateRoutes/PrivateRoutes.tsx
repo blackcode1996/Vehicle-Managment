@@ -1,6 +1,6 @@
 import React from "react";
-import { getLocalStorage } from "../utils/LocalStorage";
-import Vehicles from "../pages/Vehicles";
+import { getLocalStorage } from "../../utils/LocalStorage";
+import Vehicles from "../../pages/Vehicles";
 
 const PrivateRoutes = ({ children }: { children: React.ReactNode }) => {
   let isToken = getLocalStorage("userToken");

@@ -1,8 +1,15 @@
 import { MapPin, Clock, Navigation, Car } from "lucide-react";
+import { MapContainer, TileLayer, Marker, Polyline } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
+import { formatDate } from "../utils/formatDate";
+import { formatAddress } from "../utils/formatAddress";
+import { getStatusColor } from "../utils/getStatusColor";
+import { Icon } from "leaflet";
 
 interface Booking {
   id: string;
-  status:  "PENDING" | "ACCEPTED" | "DECLINED" | "CANCELLED";
+  status: "PENDING" | "ACCEPTED" | "DECLINED" | "CANCELLED";
   bookedFrom: string;
   bookedTo: string;
   bookingFromAddress: string;
@@ -25,47 +32,12 @@ interface BookingCardProps {
   onAddressClick?: (address: string, location: [number, number]) => void;
 }
 
-const BookingCard: React.FC<BookingCardProps> = ({ bookings, onAddressClick }) => {
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "PENDING":
-        return "bg-middle";
-      case "COMPLETED":
-        return "bg-primary";
-      case "CANCELLED":
-        return "bg-secondary";
-      default:
-        return "bg-neutral";
-    }
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const months = [
-      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-    ];
-    const month = months[date.getMonth()];
-    const day = date.getDate().toString().padStart(2, "0");
-    const year = date.getFullYear();
-    const hours = date.getHours().toString().padStart(2, "0");
-    const minutes = date.getMinutes().toString().padStart(2, "0");
-
-    return `${month} ${day}, ${year} ${hours}:${minutes}`;
-  };
-
-  const formatAddress = (address: string) => {
-    return address.split(",").slice(0, 2).join(",");
-  };
-
-  const generateMapURL = (coordinates: [number, number]) => {
-    return `https://maps.google.com/maps?q=&t=&z=13&ie=UTF8&iwloc=&output=embed&daddr=${coordinates[0]},${coordinates[1]}`;
-  };
-
-  const handleAddressClick = (address: string, location: [number, number]) => {
-    const mapURL = generateMapURL(location);
-    window.open(mapURL, "_blank"); 
-  };
+const BookingCard: React.FC<BookingCardProps> = ({ bookings }) => {
+  const primaryIcon = new Icon({
+    iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+  });
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8 p-8">
@@ -115,12 +87,8 @@ const BookingCard: React.FC<BookingCardProps> = ({ bookings, onAddressClick }) =
                 </div>
               </div>
             </div>
-
             <div className="space-y-4 mb-6">
-              <div 
-                className="flex items-start gap-3 p-3 hover:bg-neutral rounded-lg cursor-pointer transition-colors"
-                onClick={() => handleAddressClick(booking.bookingFromAddress, booking.bookingFromLocation)}
-              >
+              <div className="flex items-start gap-3 p-3">
                 <div className="mt-1">
                   <MapPin className="w-5 h-5 text-middle" />
                 </div>
@@ -135,24 +103,7 @@ const BookingCard: React.FC<BookingCardProps> = ({ bookings, onAddressClick }) =
                 </div>
               </div>
 
-              <div className="relative h-48 mt-4">
-              <iframe
-                src={generateMapURL(booking.bookingFromLocation)}
-                width="100%"
-                height="100%"
-                loading="lazy"
-                className="rounded-lg shadow-md"
-              />
-            </div>
-
-              <div className="flex justify-center">
-                <Navigation className="w-5 h-5 text-middle transform rotate-90" />
-              </div>
-              
-              <div 
-                className="flex items-start gap-3 p-3 hover:bg-neutral rounded-lg cursor-pointer transition-colors"
-                onClick={() => handleAddressClick(booking.bookingToAddress, booking.bookingToLocation)}
-              >
+              <div className="flex items-start gap-3 p-3">
                 <div className="mt-1">
                   <MapPin className="w-5 h-5 text-secondary" />
                 </div>
@@ -161,32 +112,39 @@ const BookingCard: React.FC<BookingCardProps> = ({ bookings, onAddressClick }) =
                   <p className="text-sm">
                     {formatAddress(booking.bookingToAddress)}
                   </p>
-                  <p className="text-xs mt-1">
-                    {formatDate(booking.bookedTo)}
-                  </p>
+                  <p className="text-xs mt-1">{formatDate(booking.bookedTo)}</p>
                 </div>
               </div>
-            </div>
 
-            <div className="relative h-48 mt-4">
-              <iframe
-                src={generateMapURL(booking.bookingToLocation)}
-                width="100%"
-                height="100%"
-                loading="lazy"
+              <MapContainer
+                center={booking.bookingFromLocation}
+                zoom={4}
+                style={{ height: "200px", width: "100%" }}
+                scrollWheelZoom={false}
                 className="rounded-lg shadow-md"
-              />
-            </div>
-
-            <div className="flex gap-3 mt-6">
-              <button className="flex-1 bg-primary text-white py-3 rounded-lg hover:opacity-90 transition-opacity font-medium shadow-md hover:shadow-lg">
-                View Details
-              </button>
-              {booking.status === "PENDING" && (
-                <button className="flex-1 bg-secondary text-white py-3 rounded-lg hover:opacity-90 transition-opacity font-medium shadow-md hover:shadow-lg">
-                  Cancel
-                </button>
-              )}
+              >
+                <TileLayer
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                />
+                <Marker
+                  position={booking.bookingFromLocation}
+                  icon={primaryIcon}
+                />
+                <Marker
+                  position={booking.bookingToLocation}
+                  icon={primaryIcon}
+                />
+                <Polyline
+                  positions={[
+                    booking.bookingFromLocation,
+                    booking.bookingToLocation,
+                  ]}
+                  color="blue"
+                  weight={5}
+                  opacity={0.7}
+                />
+              </MapContainer>
             </div>
           </div>
         </div>

@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../utils/axiosInstance';
-import { setLocalStorage } from '../../utils/LocalStorage';
+import { clearLocalStorage, setLocalStorage } from '../../utils/LocalStorage';
 
 interface User {
   name: string;
@@ -48,7 +48,14 @@ export const loginUser = createAsyncThunk(
 export const authSlice = createSlice({
   name: 'auth',
   initialState,
-  reducers: {},
+  reducers: {
+    logout: (state)=>{
+      state.user = null;
+      state.loading = false;
+      state.error = null;
+      clearLocalStorage();
+    }
+  },
   extraReducers: (builder) => {
     // Registration cases
     builder
@@ -84,5 +91,7 @@ export const userData = (state: RootState) => state.auth.user;
 export const userToken = (state: RootState) => state.auth.user?.token; 
 export const userError = (state: RootState) => state.auth.error;
 export const userLoading = (state: RootState) => state.auth.loading;
+
+export const { logout } = authSlice.actions;  
 
 export default authSlice.reducer;

@@ -9,13 +9,24 @@ import {
   getLocalStorage,
   setLocalStorage,
 } from "../utils/LocalStorage";
+import { useDispatch } from "react-redux";
+import { logout } from "../redux/slice/authSlice";
 
-const navLinks = [
+const baseNavLinks = [
   { title: "Home", url: "/" },
   { title: "About", url: "/about" },
-  { title: "Cars", url: "/vehicles" },
   { title: "Contact", url: "/contact" },
 ];
+
+const getNavLinks = (isAdmin: any) => {
+  const navLinks = [...baseNavLinks];
+  if (isAdmin) {
+    navLinks.push({ title: "Seller", url: "/seller" });
+  } else {
+    navLinks.push({ title: "Cars", url: "/vehicles" });
+  }
+  return navLinks;
+};
 
 const iconList = [{ icon: <FaUser /> }];
 
@@ -25,13 +36,16 @@ const Header = () => {
   const [userData, setUserData] = useState({});
   const user = getLocalStorage("user");
   const navigate = useNavigate();
-
   const location = useLocation();
+  const dispatch = useDispatch();
+  
+  const isAdmin = user?.user?.role === 'ADMIN'; 
 
+  const navLinks = getNavLinks(isAdmin);
 
   useEffect(() => {
     setUserData(user);
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -54,8 +68,8 @@ const Header = () => {
   };
 
   const handleLogout = () => {
-    clearLocalStorage();
-    navigate("/login");
+    dispatch(logout());
+    navigate("/registartion");
   };
 
   return (
@@ -76,7 +90,9 @@ const Header = () => {
                   key={index}
                   to={link.url}
                   className={`relative text-lg after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-[5px] after:bg-secondary after:transition-all after:duration-300 hover:after:w-full ${
-                    location.pathname === link.url ? "after:bg-primary after:w-full" : ""
+                    location.pathname === link.url
+                      ? "after:bg-primary after:w-full"
+                      : ""
                   }`}
                 >
                   {link.title}
@@ -86,8 +102,6 @@ const Header = () => {
 
             <div className="flex justify-center items-center gap-1">
               <ul className="flex gap-6 items-center cursor-pointer group relative z-10">
-                {/* Profile with Tooltip on Hover */}
-
                 <div className="w-[60px] h-[60px] flex justify-end items-center cursor-pointer rounded-full overflow-hidden">
                   <img
                     src={carProfile}
@@ -96,7 +110,6 @@ const Header = () => {
                   />
                 </div>
 
-                {/* Tooltip with Signup/Login buttons */}
                 <div
                   onClick={() => setLocalStorage("regsiterAsSeller", false)}
                   className="absolute top-12 right-[-50px] mt-1 w-[180px] bg-black shadow-md rounded-lg p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-300 z-50"

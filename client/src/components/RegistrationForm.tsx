@@ -51,6 +51,7 @@ const RegistrationForm = ({
     }
   }, [isLoading, isError, usersData, navigate]);
 
+
   return (
     <form className="mt-8 space-y-6" onSubmit={formik.handleSubmit}>
       <div className="relative">

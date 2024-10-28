@@ -9,10 +9,10 @@ const VerifyOTP = () => {
       <header className="mb-8">
         <h1 className="text-2xl font-bold mb-1">Email Verification</h1>
         <p className="text-[15px] text-slate-500">
-          {`Enter the 6-digit verification code that was sent to ${user.email ? user.email : "your mail"}.`}
+          {`Enter the 6-digit verification code that was sent to ${user?.email ? user.email : "your mail"}.`}
         </p>
       </header>
-      <OTPForm email={user.email} />
+      <OTPForm email={user?.email} />
     </div>
   );
 };

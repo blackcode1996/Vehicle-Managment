@@ -15,6 +15,7 @@ export default {
       neutral: "#f5f5f5",
       white: "#ffffff",
       black: "#000000",
+      green: "#008000"
     },
     extend: {
       backgroundImage: {
